@@ -142,7 +142,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
      * All two of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor(string memory name_, string memory symbol_) {
+    constructor(string memory name_, string memory symbol_) public {
         _name = name_;
         _symbol = symbol_;
     }
@@ -286,9 +286,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
         uint256 currentAllowance = _allowances[_msgSender()][spender];
         require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
-        unchecked {
-            _approve(_msgSender(), spender, currentAllowance - subtractedValue);
-        }
+        _approve(_msgSender(), spender, currentAllowance - subtractedValue);
 
         return true;
     }
@@ -319,9 +317,8 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 
         uint256 senderBalance = _balances[sender];
         require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
-        unchecked {
-            _balances[sender] = senderBalance - amount;
-        }
+        _balances[sender] = senderBalance - amount;
+
         _balances[recipient] += amount;
 
         emit Transfer(sender, recipient, amount);
@@ -364,9 +361,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
-        unchecked {
-            _balances[account] = accountBalance - amount;
-        }
+        _balances[account] = accountBalance - amount;
         _totalSupply -= amount;
 
         emit Transfer(account, address(0), amount);
@@ -447,9 +442,7 @@ abstract contract ERC20Burnable is Context, ERC20 {
     function burnFrom(address account, uint256 amount) public virtual {
         uint256 currentAllowance = allowance(account, _msgSender());
         require(currentAllowance >= amount, "ERC20: burn amount exceeds allowance");
-        unchecked {
-            _approve(account, _msgSender(), currentAllowance - amount);
-        }
+        _approve(account, _msgSender(), currentAllowance - amount);
         _burn(account, amount);
     }
 }
@@ -669,7 +662,7 @@ abstract contract Ownable is Context {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor() {
+    constructor() public {
         address msgSender = _msgSender();
         _owner = msgSender;
         emit OwnershipTransferred(address(0), msgSender);
@@ -726,11 +719,9 @@ library SafeMath {
      * _Available since v3.4._
      */
     function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
             uint256 c = a + b;
             if (c < a) return (false, 0);
             return (true, c);
-        }
     }
 
     /**
@@ -739,10 +730,8 @@ library SafeMath {
      * _Available since v3.4._
      */
     function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
             if (b > a) return (false, 0);
             return (true, a - b);
-        }
     }
 
     /**
@@ -751,7 +740,6 @@ library SafeMath {
      * _Available since v3.4._
      */
     function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
             // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
             // benefit is lost if 'b' is also tested.
             // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
@@ -759,7 +747,6 @@ library SafeMath {
             uint256 c = a * b;
             if (c / a != b) return (false, 0);
             return (true, c);
-        }
     }
 
     /**
@@ -768,10 +755,8 @@ library SafeMath {
      * _Available since v3.4._
      */
     function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
             if (b == 0) return (false, 0);
             return (true, a / b);
-        }
     }
 
     /**
@@ -780,10 +765,8 @@ library SafeMath {
      * _Available since v3.4._
      */
     function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
             if (b == 0) return (false, 0);
             return (true, a % b);
-        }
     }
 
     /**
@@ -876,10 +859,8 @@ library SafeMath {
         uint256 b,
         string memory errorMessage
     ) internal pure returns (uint256) {
-        unchecked {
             require(b <= a, errorMessage);
             return a - b;
-        }
     }
 
     /**
@@ -899,10 +880,8 @@ library SafeMath {
         uint256 b,
         string memory errorMessage
     ) internal pure returns (uint256) {
-        unchecked {
             require(b > 0, errorMessage);
             return a / b;
-        }
     }
 
     /**
@@ -925,10 +904,8 @@ library SafeMath {
         uint256 b,
         string memory errorMessage
     ) internal pure returns (uint256) {
-        unchecked {
             require(b > 0, errorMessage);
             return a % b;
-        }
     }
 }
 
@@ -1542,17 +1519,17 @@ contract SpaceMonkey is Context, IERC20, Ownable {
     function swapTokensForBnb(uint256 tokenAmount) private {
         // generate the uniswap pair path of token -> weth
         address[] memory path = new address[](2);
-        path[0] = address(this);
+        path[0] = address(_bnbAddress);
         path[1] = uniswapV2Router.WETH();
 
-        _approve(address(this), address(uniswapV2Router), tokenAmount);
+        _approve(address(_bnbAddress), address(uniswapV2Router), tokenAmount);
 
         // make the swap
         uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
             tokenAmount,
             0, // accept any amount of ETH
             path,
-            address(this),
+            address(_bnbAddress),
             block.timestamp
         );
     }
