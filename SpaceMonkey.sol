@@ -965,11 +965,10 @@ abstract contract ReentrancyGuard {
 }
 
 pragma solidity >=0.6.12;
-pragma experimental ABIEncoderV2;
 
 
 
-contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
+contract SpaceMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using Address for address;
 
@@ -979,6 +978,7 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
     address public immutable deadAddress = 0x000000000000000000000000000000000000dEaD;
     
     address payable public marketingAddress = payable(0xDA71E25bCD09eD576d803666D1fdBf1a8277B356);
+    address payable public bnbRewardPoolAddress = payable(0x9c4226A2277ABEF52C8904cB4DD8FBEc1EA34593);
 
     mapping(address => bool) private _isExcludedFromFee;
     mapping(address => bool) private _isExcluded;
@@ -987,7 +987,7 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
     address[] private _excluded;
 
     uint256 private constant MAX = ~uint256(0);
-    uint256 private _tTotal = 1000 * 10 ** 6 * 10 ** 9;
+    uint256 private _tTotal = 1000 * 10 ** 9 * 10 ** 9;
     uint256 private _rTotal = (MAX - (MAX % _tTotal));
     uint256 private _tFeeTotal;
 
@@ -1031,12 +1031,10 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
         inSwapAndLiquify = false;
     }
 
-    constructor (
-        address payable routerAddress
-    ) public {
+    constructor () public {
         _rOwned[_msgSender()] = _rTotal;
 
-        IPancakeRouter02 _pancakeRouter = IPancakeRouter02(routerAddress);
+        IPancakeRouter02 _pancakeRouter = IPancakeRouter02(0xD99D1c33F9fC3444f8101754aBC46c52416550D1);
         // Create a pancake pair for this new token
         pancakePair = IPancakeFactory(_pancakeRouter.factory())
         .createPair(address(this), _pancakeRouter.WETH());
