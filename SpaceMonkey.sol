@@ -4,9 +4,9 @@
  * $SpaceMonkey is a hyper deflationary, high rewarding token with 4 reward features 
  * 
  * 1. 7 day cycle BNB reward 
- * 2. Holder RFI Static reflection 
- * 3. Auto buyback and burn on every transaction 
- * 4. Advertising platform
+ * 2. Daily lottery reward
+ * 3. Holder RFI Static reflection 
+ * 4. Auto burn on every transaction 
  * 
  * 
  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
@@ -978,6 +978,8 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
     mapping(address => uint256) private _tOwned;
     mapping(address => mapping(address => uint256)) private _allowances;
     address public immutable deadAddress = 0x000000000000000000000000000000000000dEaD;
+    
+    address payable public marketingAddress = payable(0xDA71E25bCD09eD576d803666D1fdBf1a8277B356);
 
     mapping(address => bool) private _isExcludedFromFee;
     mapping(address => bool) private _isExcluded;
@@ -998,6 +1000,8 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
     address public immutable pancakePair;
 
     bool inSwapAndLiquify = false;
+    bool public buyBackEnabled = true;
+    uint256 private buyBackUpperLimit = 1 * 10**18;
 
     event SwapAndLiquifyEnabledUpdated(bool enabled);
     event SwapAndLiquify(
@@ -1298,9 +1302,21 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
         require(amount > 0, "Transfer amount must be greater than zero");
 
         ensureMaxTxAmount(from, to, amount, value);
-
-        // swap and liquify
-        swapAndLiquify(from, to);
+        
+        if (!inSwapAndLiquify && swapAndLiquifyEnabled && to == pancakePair) {
+            
+            // swap and liquify
+            swapAndLiquify(from, to);
+	       
+	        uint256 balance = address(this).balance;
+            if (buyBackEnabled && balance > uint256(1 * 10**18)) {
+                
+                if (balance > buyBackUpperLimit)
+                    balance = buyBackUpperLimit;
+                
+                buyBackTokens(balance.div(100));
+            }
+        }
 
         //indicates if fee should be deducted from transfer
         bool takeFee = true;
@@ -1378,13 +1394,18 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
     uint256 public disableEasyRewardFrom = 0;
     uint256 public winningDoubleRewardPercentage = 5;
 
-    uint256 public _taxFee = 2;
+    uint256 public _taxFee = 3;
     uint256 private _previousTaxFee = _taxFee;
 
-    uint256 public _liquidityFee = 12; // 2% will be added pool, 6% will be converted to BNB for cycle reward, 2% will be convered to BNB for lottery, 2% will be convered to BNB for marketing
+    uint256 public _liquidityFee = 8; // 2% will be added pool, 6% will be converted to BNB for cycle reward, 2% will be convered to BNB for lottery, 2% will be convered to BNB for marketing
     uint256 private _previousLiquidityFee = _liquidityFee;
     uint256 public rewardThreshold = 1 ether;
     
+    
+    uint256 public _lpFee = 1;
+    uint256 public _marketingFee = 1;
+    uint256 public _rewardPoolFee = 3;
+    uint256 public _buybackFee = 3;
     uint256 public _marketingDivisorFee = 3;
 
     uint256 minTokenNumberToSell = _tTotal.mul(1).div(10000).div(10); // 0.001% max tx amount will trigger swap and add liquidity
@@ -1496,21 +1517,28 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
         swapAndLiquifyEnabled &&
         !(from == address(this) && to == address(pancakePair)) // swap 1 time
         ) {
+            
             // only sell for minTokenNumberToSell, decouple from _maxTxAmount
             contractTokenBalance = minTokenNumberToSell;
 
             // add liquidity
-            // split the contract balance into 3 pieces
-            uint256 pooledBNB = contractTokenBalance.div(2);
-            uint256 piece = contractTokenBalance.sub(pooledBNB).div(2);
-            uint256 otherPiece = contractTokenBalance.sub(piece);
-
-            uint256 tokenAmountToBeSwapped = pooledBNB.add(piece);
+            // split the contract balance in to our required amounts - divide by 8 then multiply by relevant amount 
+            
+            uint256 onePercentAmount = contractTokenBalance.div(8);
+            uint256 sixPercentAmount = onePercentAmount.mul(6);
+            
+            uint256 pooledBNB = sixPercentAmount.div(_rewardPoolFee); // BNB Reward Pool 
+            uint256 piece = sixPercentAmount.sub(pooledBNB); // Buyback BNB Pool
+            
+            uint256 marketingAmount = onePercentAmount.mul(_marketingFee); // Marketing Amount 
+            
+            uint256 otherPiece = contractTokenBalance.sub(piece).sub(marketingAmount).sub(pooledBNB);
 
             uint256 initialBalance = address(this).balance;
 
             // now is to lock into staking pool
-            Utils.swapTokensForEth(address(pancakeRouter), tokenAmountToBeSwapped);
+            Utils.swapTokensForEth(address(pancakeRouter), pooledBNB); // Swap to BNB to BNB Reward Pool 
+            Utils.swapTokensForEthMarketing(address(pancakeRouter), address(marketingAddress), marketingAmount); // Swap to BNB for Buyback Pool 
 
             // how much BNB did we just swap into?
 
