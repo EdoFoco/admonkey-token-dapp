@@ -1,12 +1,11 @@
 /**
  * Inspiration was taken from both MoonRat & EverRise for this development of this token
  * 
- * $SpaceMonkey is a hyper deflationary, high rewarding token with 4 reward features 
+ * $SpaceMonkey is a hyper deflationary, high rewarding token with 3 reward features 
  * 
  * 1. 7 day cycle BNB reward 
- * 2. Daily lottery reward
- * 3. Holder RFI Static reflection 
- * 4. Auto burn on every transaction 
+ * 2. Holder RFI Static reflection 
+ * 3. Auto burn on every transaction 
  * 
  * 
  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
