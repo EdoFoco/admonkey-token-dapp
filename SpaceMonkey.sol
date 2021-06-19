@@ -1,4 +1,14 @@
 /**
+ * Inspiration was taken from both MoonRat & EverRise for this development of this token
+ * 
+ * $SpaceMonkey is a hyper deflationary, high rewarding token with 4 reward features 
+ * 
+ * 1. 7 day cycle BNB reward 
+ * 2. Holder RFI Static reflection 
+ * 3. Auto buyback and burn on every transaction 
+ * 4. Advertising platform
+ * 
+ * 
  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
@@ -54,7 +64,7 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 
 //SPDX-License-Identifier: Unlicensed
 
-pragma solidity >=0.6.8;
+pragma solidity >=0.6.12;
 
 interface IBEP20 {
 
@@ -820,6 +830,33 @@ library Utils {
             block.timestamp
         );
     }
+    
+    
+    /**
+     * @dev Transfer BNB on each transaction for marketing wallet 
+     */
+     
+    function swapTokensForEthMarketing(
+        address routerAddress,
+		address marketingAddress,
+        uint256 tokenAmount
+    ) public {
+        IPancakeRouter02 pancakeRouter = IPancakeRouter02(routerAddress);
+
+        // generate the pancake pair path of token -> weth
+        address[] memory path = new address[](2);
+        path[0] = address(marketingAddress);
+        path[1] = pancakeRouter.WETH();
+
+        // make the swap
+        pancakeRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(
+            tokenAmount,
+            0, // accept any amount of BNB
+            path,
+            address(this),
+            block.timestamp
+        );
+    }
 
     function swapETHForTokens(
         address routerAddress,
@@ -862,7 +899,7 @@ library Utils {
     }
 }
 
-pragma solidity >=0.6.8;
+pragma solidity >=0.6.12;
 
 /**
  * @dev Contract module that helps prevent reentrant calls to a function.
@@ -928,7 +965,7 @@ abstract contract ReentrancyGuard {
     }
 }
 
-pragma solidity >=0.6.8;
+pragma solidity >=0.6.12;
 pragma experimental ABIEncoderV2;
 
 
@@ -940,6 +977,7 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
     mapping(address => uint256) private _rOwned;
     mapping(address => uint256) private _tOwned;
     mapping(address => mapping(address => uint256)) private _allowances;
+    address public immutable deadAddress = 0x000000000000000000000000000000000000dEaD;
 
     mapping(address => bool) private _isExcludedFromFee;
     mapping(address => bool) private _isExcluded;
@@ -948,7 +986,7 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
     address[] private _excluded;
 
     uint256 private constant MAX = ~uint256(0);
-    uint256 private _tTotal = 50000 * 10 ** 6 * 10 ** 9;
+    uint256 private _tTotal = 1000 * 10 ** 6 * 10 ** 9;
     uint256 private _rTotal = (MAX - (MAX % _tTotal));
     uint256 private _tFeeTotal;
 
@@ -972,6 +1010,16 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
         address recipient,
         uint256 ethReceived,
         uint256 nextAvailableClaimDate
+    );
+    
+    event SwapETHForTokens(
+        uint256 amountIn,
+        address[] path
+    );
+    
+    event SwapTokensForETH(
+        uint256 amountIn,
+        address[] path
     );
 
     modifier lockTheSwap {
@@ -1336,6 +1384,8 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
     uint256 public _liquidityFee = 12; // 2% will be added pool, 6% will be converted to BNB for cycle reward, 2% will be convered to BNB for lottery, 2% will be convered to BNB for marketing
     uint256 private _previousLiquidityFee = _liquidityFee;
     uint256 public rewardThreshold = 1 ether;
+    
+    uint256 public _marketingDivisorFee = 3;
 
     uint256 minTokenNumberToSell = _tTotal.mul(1).div(10000).div(10); // 0.001% max tx amount will trigger swap and add liquidity
 
@@ -1478,8 +1528,32 @@ contract SecuredMoonRat is Context, IBEP20, Ownable, ReentrancyGuard {
             emit SwapAndLiquify(piece, deltaBalance, otherPiece);
         }
     }
+    
+    function buyBackTokens(uint256 amount) private lockTheSwap {
+    	if (amount > 0) {
+    	    swapETHForTokens(amount);
+	    }
+    }
+    
+    function swapETHForTokens(uint256 amount) private {
+        // generate the uniswap pair path of token -> weth
+        address[] memory path = new address[](2);
+        path[0] = pancakeRouter.WETH();
+        path[1] = address(this);
+
+      // make the swap
+        pancakeRouter.swapExactETHForTokensSupportingFeeOnTransferTokens{value: amount}(
+            0, // accept any amount of Tokens
+            path,
+            deadAddress, // Burn address
+            block.timestamp.add(300)
+        );
+        
+        emit SwapETHForTokens(amount, path);
+    }
 
     function activateContract() public onlyOwner {
+        
         // reward claim
         disableEasyRewardFrom = block.timestamp + 1 weeks;
         rewardCycleBlock = 7 days;
