@@ -852,7 +852,7 @@ library Utils {
             tokenAmount,
             0, // accept any amount of BNB
             path,
-            address(this),
+            marketingAddress,
             block.timestamp
         );
     }
@@ -978,7 +978,7 @@ contract SpaceMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     address public immutable deadAddress = 0x000000000000000000000000000000000000dEaD;
     
     address payable public marketingAddress = payable(0xDA71E25bCD09eD576d803666D1fdBf1a8277B356);
-    address payable public bnbRewardPoolAddress = payable(0x9c4226A2277ABEF52C8904cB4DD8FBEc1EA34593);
+    address payable public bnbRewardPoolAddress = payable(address(this));
 
     mapping(address => bool) private _isExcludedFromFee;
     mapping(address => bool) private _isExcluded;
@@ -1031,10 +1031,12 @@ contract SpaceMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         inSwapAndLiquify = false;
     }
 
-    constructor () public {
+    constructor (
+        address payable routerAddress
+        ) public {
         _rOwned[_msgSender()] = _rTotal;
 
-        IPancakeRouter02 _pancakeRouter = IPancakeRouter02(0xD99D1c33F9fC3444f8101754aBC46c52416550D1);
+        IPancakeRouter02 _pancakeRouter = IPancakeRouter02(routerAddress);
         // Create a pancake pair for this new token
         pancakePair = IPancakeFactory(_pancakeRouter.factory())
         .createPair(address(this), _pancakeRouter.WETH());
@@ -1193,6 +1195,14 @@ contract SpaceMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     function setSwapAndLiquifyEnabled(bool _enabled) public onlyOwner {
         swapAndLiquifyEnabled = _enabled;
         emit SwapAndLiquifyEnabledUpdated(_enabled);
+    }
+    
+    function setMarketingAddress(address payable _marketingAddress) external onlyOwner() {
+        marketingAddress = _marketingAddress;
+    }
+    
+    function setBnbRewardAddress(address payable _bnbRewardAddress) external onlyOwner() {
+        bnbRewardPoolAddress = _bnbRewardAddress;
     }
 
     //to receive BNB from pancakeRouter when swapping
@@ -1390,6 +1400,8 @@ contract SpaceMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     uint256 public disruptiveTransferEnabledFrom = 0;
     uint256 public disableEasyRewardFrom = 0;
     uint256 public winningDoubleRewardPercentage = 5;
+    bool public _marketingRewardEnabled = true;
+    bool public _bnbRewardPoolEnabled = true;
 
     uint256 public _taxFee = 3;
     uint256 private _previousTaxFee = _taxFee;
@@ -1413,6 +1425,18 @@ contract SpaceMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
 
     function setExcludeFromMaxTx(address _address, bool value) public onlyOwner {
         _isExcludedFromMaxTx[_address] = value;
+    }
+    
+    function setBuyBackStatus(bool status) public onlyOwner {
+        buyBackEnabled = status;
+    }
+    
+    function marketingRewardEnabled(bool status) public onlyOwner {
+        _marketingRewardEnabled = status;
+    }
+    
+    function bnbRewardPoolEnabled(bool status) public onlyOwner {
+        _bnbRewardPoolEnabled = status;
     }
 
     function calculateBNBReward(address ofAddress) public view returns (uint256) {
@@ -1495,10 +1519,12 @@ contract SpaceMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     }
 
     function swapAndLiquify(address from, address to) private {
+        
         // is the token balance of this contract address over the min number of
         // tokens that we need to initiate a swap + liquidity lock?
         // also, don't get caught in a circular liquidity event.
         // also, don't swap & liquify if sender is pancake pair.
+        
         uint256 contractTokenBalance = balanceOf(address(this));
 
         if (contractTokenBalance >= _maxTxAmount) {
@@ -1521,21 +1547,27 @@ contract SpaceMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
             // add liquidity
             // split the contract balance in to our required amounts - divide by 8 then multiply by relevant amount 
             
-            uint256 onePercentAmount = contractTokenBalance.div(8);
-            uint256 sixPercentAmount = onePercentAmount.mul(6);
+            //uint256 onePercentAmount = contractTokenBalance.div(8);
+            //uint256 sixPercentAmount = onePercentAmount.mul(6);
             
-            uint256 pooledBNB = sixPercentAmount.div(_rewardPoolFee); // BNB Reward Pool 
-            uint256 piece = sixPercentAmount.sub(pooledBNB); // Buyback BNB Pool
+            //uint256 pooledBNB = sixPercentAmount.div(_rewardPoolFee); // BNB Reward Pool 
+            //uint256 piece = sixPercentAmount.sub(pooledBNB); // Buyback BNB Pool
             
-            uint256 marketingAmount = onePercentAmount.mul(_marketingFee); // Marketing Amount 
+            //uint256 marketingAmount = onePercentAmount.mul(_marketingFee); // Marketing Amount 
             
-            uint256 otherPiece = contractTokenBalance.sub(piece).sub(marketingAmount).sub(pooledBNB);
+            //uint256 otherPiece = contractTokenBalance.sub(piece).sub(marketingAmount).sub(pooledBNB);
+
+            // split the contractTokenBalance into 2 ready for LP/BuyBack 
+            uint256 halfBalance = contractTokenBalance.div(2);
+            
+            uint256 lpHalf = halfBalance.sub(halfBalance).div(2);
+            uint256 lpSecondHalf = halfBalance.sub(lpHalf);
 
             uint256 initialBalance = address(this).balance;
 
             // now is to lock into staking pool
-            Utils.swapTokensForEth(address(pancakeRouter), pooledBNB); // Swap to BNB to BNB Reward Pool 
-            Utils.swapTokensForEthMarketing(address(pancakeRouter), address(marketingAddress), marketingAmount); // Swap to BNB for Buyback Pool 
+            Utils.swapTokensForEth(address(pancakeRouter), halfBalance); // Swap to BNB for BNB Reward Pool 
+            //Utils.swapTokensForEthMarketing(address(pancakeRouter), address(marketingAddress), marketingAmount); // Swap to BNB for Marketing 
 
             // how much BNB did we just swap into?
 
@@ -1548,9 +1580,9 @@ contract SpaceMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
             uint256 bnbToBeAddedToLiquidity = deltaBalance.div(3);
 
             // add liquidity to pancake
-            Utils.addLiquidity(address(pancakeRouter), owner(), otherPiece, bnbToBeAddedToLiquidity);
+            Utils.addLiquidity(address(pancakeRouter), owner(), lpHalf, bnbToBeAddedToLiquidity);
 
-            emit SwapAndLiquify(piece, deltaBalance, otherPiece);
+            emit SwapAndLiquify(lpHalf, deltaBalance, lpSecondHalf);
         }
     }
     
