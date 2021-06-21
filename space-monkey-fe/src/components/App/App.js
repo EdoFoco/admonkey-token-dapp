@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import AppContext from '../../services/app-context';
 import Routes from '../Routes';
+import Dashboard from '../Rewards/rewardsDashboard/Dashboard';
 import Web3ErrorModal from '../Modals/Web3ErrorModal';
 import { MainLayout } from '../Layout';
 import {
@@ -34,7 +35,8 @@ class App extends Component {
 
     return (
       <AppContext.Provider value={this.state.appContext}>
-        <MainLayout><Routes /></MainLayout>
+        {/* <MainLayout><Routes /></MainLayout> */}
+        <Dashboard />
       </AppContext.Provider>
     );
   }
