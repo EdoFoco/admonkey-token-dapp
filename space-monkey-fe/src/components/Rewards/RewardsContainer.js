@@ -37,17 +37,18 @@ class RewardsContainer extends React.Component {
                 SpaceMonkeyContract.drizzle = drizzle;
                 SpaceMonkeyContract.calculateBNBReward()
                     .then(reward => {
-                        this.setState({ "reward": reward });
+                        console.log(this.state);
+                        this.setState({ "reward": Math.round(reward / (10 ** 18) * 100000, 6) / 100000});
                     });
 
                 SpaceMonkeyContract.getBalance()
                     .then(balance => {
-                        this.setState({ "balance": balance });
+                        this.setState({ "balance": Math.round(reward / (10 ** 9) * 100000, 6) / 100000});
                     });
 
                 SpaceMonkeyContract.nextAvailableClaimDate()
                     .then(date => {
-                        this.setState({ "nextAvailableClaimDate": date });
+                        this.setState({ "nextAvailableClaimDate": new Date(date * 1000) });
                     });
             }
         });
@@ -62,12 +63,12 @@ class RewardsContainer extends React.Component {
     }
 
     render() {
-        console.log(this.state.reward);
         if(this.drizzleState.accounts.length == 0){
             return(<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
         }
        
-        return ( <Dashboard reward={this.state.reward} balance={this.state.balance} nextAvailableClaimDate={this.state.nextAvailableClaimDate} />);
+        return ( 
+        <Dashboard reward={this.state.reward} balance={this.state.balance} nextAvailableClaimDate={this.state.nextAvailableClaimDate} />);
         // // <div className="reward-container">
         // //     <div className="reward-box">
         // //         <div className="reward-title">Your Reward</div>

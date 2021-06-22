@@ -26,7 +26,7 @@ export default function Deposits(props) {
         {props.reward}
       </Typography>
       <Typography color="textSecondary" className={classes.depositContext}>
-        on {props.nextAvailableClaimDate}
+        on {props.nextAvailableClaimDate ? props.nextAvailableClaimDate.toString() : null}
       </Typography>
       <div>
         <Link color="primary" href="#" onClick={preventDefault}>
@@ -39,6 +39,6 @@ export default function Deposits(props) {
 
 Deposits.propTypes = {
   rewards: PropTypes.string,
-  nextAvailableClaimDate: PropTypes.string,
+  nextAvailableClaimDate: PropTypes.instanceOf(Date),
   balance: PropTypes.string,
 };

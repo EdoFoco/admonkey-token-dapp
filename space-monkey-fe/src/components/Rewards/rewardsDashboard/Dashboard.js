@@ -200,7 +200,7 @@ export default function Dashboard(props) {
 
 Dashboard.propTypes = {
   reward: PropTypes.string,
-  nextAvailableClaimDate: PropTypes.string,
+  nextAvailableClaimDate: PropTypes.instanceOf(Date),
   balance: PropTypes.string,
   drizzleContext: PropTypes.object
 };
