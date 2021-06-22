@@ -35,8 +35,7 @@ class App extends Component {
 
     return (
       <AppContext.Provider value={this.state.appContext}>
-        {/* <MainLayout><Routes /></MainLayout> */}
-        <Dashboard />
+        <Routes />
       </AppContext.Provider>
     );
   }

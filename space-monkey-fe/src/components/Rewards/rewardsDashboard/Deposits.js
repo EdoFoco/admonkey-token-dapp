@@ -3,6 +3,7 @@ import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Title from './Title';
+import PropTypes from 'prop-types';
 
 function preventDefault(event) {
   event.preventDefault();
@@ -14,16 +15,18 @@ const useStyles = makeStyles({
   },
 });
 
-export default function Deposits() {
+export default function Deposits(props) {
   const classes = useStyles();
+  console.log(`Deposit`, props);
+
   return (
     <React.Fragment>
       <Title>Your Rewards</Title>
       <Typography component="p" variant="h4">
-        12.73 BNB
+        {props.reward}
       </Typography>
       <Typography color="textSecondary" className={classes.depositContext}>
-        on 15 March, 2019
+        on {props.nextAvailableClaimDate ? props.nextAvailableClaimDate.toString() : null}
       </Typography>
       <div>
         <Link color="primary" href="#" onClick={preventDefault}>
@@ -33,3 +36,9 @@ export default function Deposits() {
     </React.Fragment>
   );
 }
+
+Deposits.propTypes = {
+  rewards: PropTypes.string,
+  nextAvailableClaimDate: PropTypes.instanceOf(Date),
+  balance: PropTypes.string,
+};

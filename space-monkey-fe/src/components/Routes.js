@@ -9,11 +9,11 @@ function Routes(props) {
   return (
     <Router>
       <Route path="/" exact render={props =>
-        // <RewardsContainer />
-        <Dashboard />
+        <RewardsContainer />
+        //<Dashboard />
       } />
       {/* <Route path="/pots" exact render={ props =>
-        <MainLayout><Pots /></MainLayout>
+        // <MainLayout><Pots /></MainLayout>
       }/> */}
 
     </Router>

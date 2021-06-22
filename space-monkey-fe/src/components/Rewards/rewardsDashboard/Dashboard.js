@@ -19,6 +19,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
+import PropTypes from 'prop-types';
 // import Chart from './Chart';
 import Deposits from './Deposits';
 import Orders from './Orders';
@@ -117,7 +118,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard() {
+export default function Dashboard(props) {
+  console.log(`Dashboard`, props);
+
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -176,7 +179,7 @@ export default function Dashboard() {
             {/* Recent Deposits */}
             <Grid item xs={12} md={4} lg={3}>
               <Paper className={fixedHeightPaper}>
-                <Deposits />
+                <Deposits reward={props.reward} balance={props.balance} nextAvailableClaimDate={props.nextAvailableClaimDate} />
               </Paper>
             </Grid>
             {/* Recent Orders */}
@@ -194,3 +197,10 @@ export default function Dashboard() {
     </div>
   );
 }
+
+Dashboard.propTypes = {
+  reward: PropTypes.string,
+  nextAvailableClaimDate: PropTypes.instanceOf(Date),
+  balance: PropTypes.string,
+  drizzleContext: PropTypes.object
+};
