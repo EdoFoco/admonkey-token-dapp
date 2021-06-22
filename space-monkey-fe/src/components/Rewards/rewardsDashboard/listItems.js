@@ -4,10 +4,11 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import HistoryIcon from '@material-ui/icons/History';
+import EqualizerIcon from '@material-ui/icons/Equalizer';
+import InfoIcon from '@material-ui/icons/Info';
 
 export const mainListItems = (
   <div>
@@ -17,24 +18,36 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
     </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AddShoppingCartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Buy" />
-    </ListItem>
+    <a href="https://pancakeswap.com/" target="_blank">
+      <ListItem button>
+        <ListItemIcon>
+          <AddShoppingCartIcon />
+        </ListItemIcon>
+        <ListItemText primary="Buy" />
+      </ListItem>
+    </a>
     <ListItem button>
       <ListItemIcon>
         <HistoryIcon />
       </ListItemIcon>
       <ListItemText primary="Orders" />
     </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <LayersIcon />
-      </ListItemIcon>
-      <ListItemText primary="Integrations" />
-    </ListItem>
+    <a href="https://poocoin.com/" target="_blank">
+      <ListItem button>
+        <ListItemIcon>
+          <EqualizerIcon />
+        </ListItemIcon>
+        <ListItemText primary="Charts" />
+      </ListItem>
+    </a>
+    <a href="https://bscscan.com/token/0xC66e4F27D927B137D6245fc8647Eef887a127924" target="_blank">
+      <ListItem button>
+        <ListItemIcon>
+          <InfoIcon />
+        </ListItemIcon>
+        <ListItemText primary="Contract Details" />
+      </ListItem>
+    </a>
   </div>
 );
 

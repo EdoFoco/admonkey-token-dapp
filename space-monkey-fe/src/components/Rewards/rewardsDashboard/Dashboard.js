@@ -21,7 +21,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
 import PropTypes from 'prop-types';
 // import Chart from './Chart';
-import Deposits from './Deposits';
+import Rewards from './Rewards';
 import Orders from './Orders';
 
 function Copyright() {
@@ -130,7 +130,7 @@ export default function Dashboard(props) {
     setOpen(false);
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-
+  const { reward, balance, nextAvailableClaimDate} = props;
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -176,10 +176,10 @@ export default function Dashboard(props) {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-            {/* Recent Deposits */}
+            {/* Your Rewards */}
             <Grid item xs={12} md={4} lg={3}>
               <Paper className={fixedHeightPaper}>
-                <Deposits reward={props.reward} balance={props.balance} nextAvailableClaimDate={props.nextAvailableClaimDate} />
+                <Rewards reward={reward} balance={balance} nextAvailableClaimDate={nextAvailableClaimDate} />
               </Paper>
             </Grid>
             {/* Recent Orders */}
