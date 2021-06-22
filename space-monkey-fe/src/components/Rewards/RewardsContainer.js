@@ -43,7 +43,7 @@ class RewardsContainer extends React.Component {
 
                 SpaceMonkeyContract.getBalance()
                     .then(balance => {
-                        this.setState({ "balance": Math.round(reward / (10 ** 9) * 100000, 6) / 100000});
+                        this.setState({ "balance": Math.round(balance / (10 ** 9) * 100000, 6) / 100000});
                     });
 
                 SpaceMonkeyContract.nextAvailableClaimDate()
