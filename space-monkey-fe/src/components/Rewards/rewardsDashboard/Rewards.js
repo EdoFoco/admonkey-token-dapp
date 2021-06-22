@@ -28,7 +28,7 @@ export default function Rewards(props) {
       </Typography>
       <Typography color="textSecondary" className={classes.depositContext}>
         {/* on {nextAvailableClaimDate ? nextAvailableClaimDate.toString() : null} */}
-        on {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'Do MMM yyyy') : null}
+        on {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'do MMM yyyy') : null}
       </Typography>
       <div>
         <Link color="primary" href="#" onClick={preventDefault}>
