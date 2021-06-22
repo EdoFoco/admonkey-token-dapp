@@ -8,6 +8,7 @@ import { withDrizzleContextConsumer } from '../../services/drizzle';
 
 // smart contracts
 import SpaceMonkeyContract from '../../contracts/SpaceMonkey.js';
+import Dashboard from './rewardsDashboard/Dashboard';
 
 class RewardsContainer extends React.Component {
 
@@ -15,7 +16,6 @@ class RewardsContainer extends React.Component {
         super(props);
 
         const { drizzle, drizzleState, initialized } = props.drizzleContext;
-        console.log(drizzleState);
         this.web3 = drizzle.web3;
         this.contracts = drizzle.contracts;
         this.drizzleState = drizzleState;
@@ -62,21 +62,22 @@ class RewardsContainer extends React.Component {
     }
 
     render() {
+        console.log(this.state.reward);
         if(this.drizzleState.accounts.length == 0){
             return(<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
         }
        
-        return (
-        <div className="reward-container">
-            <div className="reward-box">
-                <div className="reward-title">Your Reward</div>
-                <div className="reward-value">{Math.round((this.state.reward / (10 ** 18) * 100000), 6) / 100000} BNB</div>
-                <div className="reward-date">You can withdraw your reward on the {this.state.nextAvailableClaimDate}</div>
-                <button className="buy-button" onClick={this.clickMe}>Claim Reward</button>
-            </div>
-            {/* Your balance is: {this.state.balance / (10 ** 9)} SPC */}
+        return ( <Dashboard reward={this.state.reward} balance={this.state.balance} nextAvailableClaimDate={this.state.nextAvailableClaimDate} />);
+        // // <div className="reward-container">
+        // //     <div className="reward-box">
+        // //         <div className="reward-title">Your Reward</div>
+        // //         <div className="reward-value">{Math.round((this.state.reward / (10 ** 18) * 100000), 6) / 100000} BNB</div>
+        // //         <div className="reward-date">You can withdraw your reward on the {this.state.nextAvailableClaimDate}</div>
+        // //         <button className="buy-button" onClick={this.clickMe}>Claim Reward</button>
+        // //     </div>
+        // //     {/* Your balance is: {this.state.balance / (10 ** 9)} SPC */}
         
-        </div>);
+        // </div>);
     }
 }
 
