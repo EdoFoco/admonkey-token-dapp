@@ -7,6 +7,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Title from './Title';
+import PropTypes from 'prop-types';
+import { format } from 'date-fns';
 
 // Generate Order Data
 function createData(id, date, name, shipTo, paymentMethod, amount) {
@@ -31,25 +33,29 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Orders() {
+export default function Orders(props) {
+  console.log(props);
   const classes = useStyles();
+  const transactions = props.transactions ? props.transactions : [];
   return (
     <React.Fragment>
       <Title>Recent Orders</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Date</TableCell>
+            <TableCell>Transaction id</TableCell>
             <TableCell>Amount</TableCell>
-            <TableCell>Balance</TableCell>
+            <TableCell>Direction</TableCell>
+            <TableCell>Date</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {transactions.map((row) => (
             <TableRow key={row.id}>
-              <TableCell>{row.date}</TableCell>
-              <TableCell align="right">{row.amount}</TableCell>
-              <TableCell align="right">0.00</TableCell>
+              <TableCell><a href={`${process.env.REACT_APP_BSCSCAN_BASE_URL}/tx/${row.hash}`}>{row.hash}</a></TableCell>
+              <TableCell align="right">{Math.round(row.value * 1000, 6) / 1000}</TableCell>
+              <TableCell align="right">{row.direction}</TableCell>
+              <TableCell align="right">{format(row.timeStamp * 1000, 'do MMM yyyy')}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -61,4 +67,8 @@ export default function Orders() {
       </div>
     </React.Fragment>
   );
+}
+
+Orders.propTypes = {
+  transactions: PropTypes.array
 }

@@ -7,8 +7,10 @@ import { withAppContextConsumer } from '../../services/app-context';
 import { withDrizzleContextConsumer } from '../../services/drizzle';
 
 // smart contracts
-import SpaceMonkeyContract from '../../contracts/SpaceMonkey.js';
+import SpaceMonkeyContract from '../../contracts/SpaceMonkey';
 import Dashboard from './rewardsDashboard/Dashboard';
+
+import { getTokenTransactionsForWallet } from '../../services/bsscan';
 
 class RewardsContainer extends React.Component {
 
@@ -22,6 +24,10 @@ class RewardsContainer extends React.Component {
 
         this.state = {
             initialized: false,
+            reward: null,
+            balance: null,
+            nextAvailableClaimDate: null,
+            transactions: null
         };
     }
 
@@ -37,19 +43,26 @@ class RewardsContainer extends React.Component {
                 SpaceMonkeyContract.drizzle = drizzle;
                 SpaceMonkeyContract.calculateBNBReward()
                     .then(reward => {
-                        console.log(this.state);
+                        // Todo: Handle BigInts
                         this.setState({ "reward": Math.round(reward / (10 ** 18) * 100000, 6) / 100000});
                     });
 
                 SpaceMonkeyContract.getBalance()
                     .then(balance => {
-                        this.setState({ "balance": Math.round(balance / (10 ** 9) * 100000, 6) / 100000});
+                        // Todo: Handle BigInts
+                        this.setState({ "balance": (Math.round(balance / (10 ** 9) * 100000, 6) / 100000).toString()});
                     });
 
                 SpaceMonkeyContract.nextAvailableClaimDate()
                     .then(date => {
                         this.setState({ "nextAvailableClaimDate": new Date(date * 1000) });
                     });
+
+                getTokenTransactionsForWallet(drizzleState.accounts[0])
+                .then(txns => {
+                    this.setState({"transactions": txns});
+                });
+                
             }
         });
     }
@@ -68,7 +81,11 @@ class RewardsContainer extends React.Component {
         }
        
         return ( 
-        <Dashboard reward={this.state.reward} balance={this.state.balance} nextAvailableClaimDate={this.state.nextAvailableClaimDate} />);
+        <Dashboard 
+            reward={this.state.reward} 
+            balance={this.state.balance} 
+            nextAvailableClaimDate={this.state.nextAvailableClaimDate}
+            transactions={this.state.transactions} />);
         // // <div className="reward-container">
         // //     <div className="reward-box">
         // //         <div className="reward-title">Your Reward</div>

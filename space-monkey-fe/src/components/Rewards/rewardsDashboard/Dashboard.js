@@ -119,8 +119,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Dashboard(props) {
-  console.log(`Dashboard`, props);
-
+  console.log(props);
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -130,7 +129,7 @@ export default function Dashboard(props) {
     setOpen(false);
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  const { reward, balance, nextAvailableClaimDate} = props;
+  const { reward, balance, nextAvailableClaimDate } = props;
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -185,7 +184,7 @@ export default function Dashboard(props) {
             {/* Recent Orders */}
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <Orders />
+                <Orders transactions={props.transactions} />
               </Paper>
             </Grid>
           </Grid>
@@ -202,5 +201,6 @@ Dashboard.propTypes = {
   reward: PropTypes.string,
   nextAvailableClaimDate: PropTypes.instanceOf(Date),
   balance: PropTypes.string,
-  drizzleContext: PropTypes.object
+  drizzleContext: PropTypes.object,
+  transactions: PropTypes.array
 };
