@@ -198,20 +198,20 @@ export default function Dashboard(props) {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             {/* Your Rewards */}
-            <Grid item xs={12} md={4} lg={3}>
+            <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
                 <Rewards reward={reward} balance={balance} nextAvailableClaimDate={nextAvailableClaimDate} />
               </Paper>
             </Grid>
 
 
-            <Grid item xs={12} md={4} lg={3}>
+            <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
                 <RfiReward rfiReward={rfiReward} />
               </Paper>
             </Grid>
 
-            <Grid item xs={12} md={4} lg={3}>
+            <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
                 <Balance balance={balance} />
               </Paper>
