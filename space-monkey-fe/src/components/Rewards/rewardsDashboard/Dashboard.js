@@ -22,7 +22,9 @@ import { mainListItems, secondaryListItems } from './listItems';
 import PropTypes from 'prop-types';
 // import Chart from './Chart';
 import Rewards from './Rewards';
-import Orders from './Orders';
+import Transactions from './Transactions';
+import RfiReward from './RfiReward';
+import Balance from './Balance';
 
 function Copyright() {
   return (
@@ -118,8 +120,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const calculateReflectionReward = (balance, transactions) => {
+  const balanceValue = Number(balance);
+  let investment = 0;
+  for (let i = 0; i < transactions.length; i++) {
+    const value = Number(transactions[i].value);
+
+    if (transactions[i].direction == "in")
+      investment += value;
+    else
+      investment -= value;
+  }
+
+  return balanceValue - investment;
+}
+
 export default function Dashboard(props) {
-  console.log(props);
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -129,7 +145,13 @@ export default function Dashboard(props) {
     setOpen(false);
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  const { reward, balance, nextAvailableClaimDate } = props;
+  const { reward, balance, nextAvailableClaimDate, transactions } = props;
+  let rfiReward = 0;
+
+  if (balance && transactions.length > 0) {
+    rfiReward = calculateReflectionReward(balance, transactions);
+  }
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -181,10 +203,24 @@ export default function Dashboard(props) {
                 <Rewards reward={reward} balance={balance} nextAvailableClaimDate={nextAvailableClaimDate} />
               </Paper>
             </Grid>
+
+
+            <Grid item xs={12} md={4} lg={3}>
+              <Paper className={fixedHeightPaper}>
+                <RfiReward rfiReward={rfiReward} />
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={4} lg={3}>
+              <Paper className={fixedHeightPaper}>
+                <Balance balance={balance} />
+              </Paper>
+            </Grid>
+
             {/* Recent Orders */}
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <Orders transactions={props.transactions} />
+                <Transactions transactions={transactions} />
               </Paper>
             </Grid>
           </Grid>

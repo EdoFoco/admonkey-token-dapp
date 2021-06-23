@@ -27,7 +27,7 @@ class RewardsContainer extends React.Component {
             reward: null,
             balance: null,
             nextAvailableClaimDate: null,
-            transactions: null
+            transactions: []
         };
     }
 
@@ -50,7 +50,7 @@ class RewardsContainer extends React.Component {
                 SpaceMonkeyContract.getBalance()
                     .then(balance => {
                         // Todo: Handle BigInts
-                        this.setState({ "balance": (Math.round(balance / (10 ** 9) * 100000, 6) / 100000).toString()});
+                        this.setState({ "balance": (balance).toString()});
                     });
 
                 SpaceMonkeyContract.nextAvailableClaimDate()
@@ -59,9 +59,9 @@ class RewardsContainer extends React.Component {
                     });
 
                 getTokenTransactionsForWallet(drizzleState.accounts[0])
-                .then(txns => {
-                    this.setState({"transactions": txns});
-                });
+                    .then(txns => {
+                        this.setState({"transactions": txns});
+                    });
                 
             }
         });

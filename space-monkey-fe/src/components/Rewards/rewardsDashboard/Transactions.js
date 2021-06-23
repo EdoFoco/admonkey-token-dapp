@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Orders(props) {
+export default function Transactions(props) {
   console.log(props);
   const classes = useStyles();
   const transactions = props.transactions ? props.transactions : [];
@@ -69,6 +69,6 @@ export default function Orders(props) {
   );
 }
 
-Orders.propTypes = {
+Transactions.propTypes = {
   transactions: PropTypes.array
 }

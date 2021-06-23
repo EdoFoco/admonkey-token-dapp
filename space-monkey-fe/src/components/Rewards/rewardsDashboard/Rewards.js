@@ -22,7 +22,7 @@ export default function Rewards(props) {
   console.log(nextAvailableClaimDate);
   return (
     <React.Fragment>
-      <Title>Your Rewards</Title>
+      <Title>Your BNB Rewards</Title>
       <Typography component="p" variant="h4">
         {reward}
       </Typography>
