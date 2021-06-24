@@ -62,7 +62,7 @@ class RewardsContainer extends React.Component {
                     .then(txns => {
                         this.setState({"transactions": txns});
                     });
-                
+
             }
         });
     }
@@ -76,14 +76,14 @@ class RewardsContainer extends React.Component {
     }
 
     render() {
-        if(this.drizzleState.accounts.length == 0){
+        if(this.drizzleState.accounts.length === 0){
             return(<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
         }
-       
-        return ( 
-        <Dashboard 
-            reward={this.state.reward} 
-            balance={this.state.balance} 
+
+        return (
+        <Dashboard
+            reward={this.state.reward}
+            balance={this.state.balance}
             nextAvailableClaimDate={this.state.nextAvailableClaimDate}
             transactions={this.state.transactions} />);
         // // <div className="reward-container">
@@ -94,7 +94,7 @@ class RewardsContainer extends React.Component {
         // //         <button className="buy-button" onClick={this.clickMe}>Claim Reward</button>
         // //     </div>
         // //     {/* Your balance is: {this.state.balance / (10 ** 9)} SPC */}
-        
+
         // </div>);
     }
 }

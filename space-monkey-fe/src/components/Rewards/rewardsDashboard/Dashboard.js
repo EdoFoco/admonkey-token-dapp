@@ -21,6 +21,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
 import PropTypes from 'prop-types';
 // import Chart from './Chart';
+import ClaimReward from './ClaimReward';
 import Rewards from './Rewards';
 import Transactions from './Transactions';
 import RfiReward from './RfiReward';
@@ -197,27 +198,26 @@ export default function Dashboard(props) {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-            {/* Your Rewards */}
+            <Grid item xs={12} md={3} lg={4}>
+              <Paper className={fixedHeightPaper}>
+                <ClaimReward reward={reward} balance={balance} nextAvailableClaimDate={nextAvailableClaimDate} />
+              </Paper>
+            </Grid>
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
                 <Rewards reward={reward} balance={balance} nextAvailableClaimDate={nextAvailableClaimDate} />
               </Paper>
             </Grid>
-
-
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
                 <RfiReward rfiReward={rfiReward} />
               </Paper>
             </Grid>
-
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
                 <Balance balance={balance} />
               </Paper>
             </Grid>
-
-            {/* Recent Orders */}
             <Grid item xs={12}>
               <Paper className={classes.paper}>
                 <Transactions transactions={transactions} />

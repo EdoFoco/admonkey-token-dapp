@@ -19,7 +19,6 @@ const useStyles = makeStyles({
 export default function Rewards(props) {
   const { reward, nextAvailableClaimDate } = props;
   const classes = useStyles();
-  console.log(nextAvailableClaimDate);
   return (
     <React.Fragment>
       <Title>Your BNB Rewards</Title>
@@ -27,8 +26,7 @@ export default function Rewards(props) {
         {reward}
       </Typography>
       <Typography color="textSecondary" className={classes.depositContext}>
-        {/* on {nextAvailableClaimDate ? nextAvailableClaimDate.toString() : null} */}
-        on {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'do MMM yyyy') : null}
+        on {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'do MMM yyyy') : ''}
       </Typography>
       <div>
         <Link color="primary" href="#" onClick={preventDefault}>
