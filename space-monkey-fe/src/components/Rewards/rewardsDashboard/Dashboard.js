@@ -146,7 +146,7 @@ export default function Dashboard(props) {
     setOpen(false);
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  const { reward, balance, nextAvailableClaimDate, transactions } = props;
+  const { reward, onClaimReward, isClaimButtonDisabled, balance, nextAvailableClaimDate, transactions } = props;
   let rfiReward = 0;
 
   if (balance && transactions.length > 0) {
@@ -200,7 +200,13 @@ export default function Dashboard(props) {
           <Grid container spacing={3}>
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
-                <ClaimReward reward={reward} balance={balance} nextAvailableClaimDate={nextAvailableClaimDate} />
+                <ClaimReward
+                  reward={reward}
+                  balance={balance}
+                  nextAvailableClaimDate={nextAvailableClaimDate}
+                  onClaimReward={onClaimReward}
+                  disabled={isClaimButtonDisabled}
+                />
               </Paper>
             </Grid>
             <Grid item xs={12} md={3} lg={4}>

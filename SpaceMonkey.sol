@@ -1,27 +1,24 @@
 /**
- *Submitted for verification at BscScan.com on 2021-06-12
-*/
-
-/*
-
-EverRise is built upon the fundamentals of Buyback and increasing the investor's value
-    
-Main features are
-    
-1) 2% tax is collected and distributed to holders for HODLing
-2) 9% buyback and marketing tax is collected and 3% of it is sent for marketing fund and othe 6% is used to buyback the tokens
-    
-    
- ________                              _______   __                     
-/        |                            /       \ /  |                    
-$$$$$$$$/__     __  ______    ______  $$$$$$$  |$$/   _______   ______  
-$$ |__  /  \   /  |/      \  /      \ $$ |__$$ |/  | /       | /      \ 
-$$    | $$  \ /$$//$$$$$$  |/$$$$$$  |$$    $$< $$ |/$$$$$$$/ /$$$$$$  |
-$$$$$/   $$  /$$/ $$    $$ |$$ |  $$/ $$$$$$$  |$$ |$$      \ $$    $$ |
-$$ |_____ $$ $$/  $$$$$$$$/ $$ |      $$ |  $$ |$$ | $$$$$$  |$$$$$$$$/ 
-$$       | $$$/   $$       |$$ |      $$ |  $$ |$$ |/     $$/ $$       |
-$$$$$$$$/   $/     $$$$$$$/ $$/       $$/   $$/ $$/ $$$$$$$/   $$$$$$$/ 
-                                                                        
+ * 
+ * AdMonkey is a deflationary BSC token with a real life usecase. Benefiting from multiple rewards.
+ * 
+ * 1. BNB Reward Pool - 3% of every transaction is sent to the BNB Reward Pool
+ * 2. Automatic Buyback - 3% of every transaction is sent back to the contract for it to automatically buyback sells.
+ * 3. RFI Static Rewards - 3% of every transaction is reflected (distributed) amongst holders relative to their holdings.
+ * 
+ * Web: https://admonkey.network
+ * Telegram: https://t.me/admonkeytoken
+ * Twitter: https://twitter.com/AdMonkeyToken 
+ * Facebook: https://www.facebook.com/AdMonkeyNetwork
+ * 
+ * @dev - Ensure optimization is enabled on Remix to submit.
+    ___       ____  ___            __             
+   /   | ____/ /  |/  /___  ____  / /_____  __  __
+  / /| |/ __  / /|_/ / __ \/ __ \/ //_/ _ \/ / / /
+ / ___ / /_/ / /  / / /_/ / / / / ,< /  __/ /_/ / 
+/_/  |_\__,_/_/  /_/\____/_/ /_/_/|_|\___/\__, /  
+                                         /____/   
+                                                                                                   
 
 */
 
@@ -672,9 +669,7 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
     mapping (address => uint256) private _rOwned;
     mapping (address => uint256) private _tOwned;
     mapping (address => mapping (address => uint256)) private _allowances;
-    mapping (address => bool) private _canTransfer;
-    mapping (address => uint256) private _lastSell;
-    mapping (address => uint256) private _lastSellAmount;
+    mapping (address => uint256) private _canNextTransfer;
 
     mapping (address => bool) private _isExcludedFromFee;
     mapping(address => bool) private _isExcludedFromMaxTx;
@@ -686,6 +681,7 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
     uint256 private _tTotal = 1000 * 10**9 * 10**9;
     uint256 private _rTotal = (MAX - (MAX % _tTotal));
     uint256 private _tFeeTotal;
+    uint256 minHolderBalance = 500 * 10**6 * 10**9;
 
     string private _name = "AdMonkey";
     string private _symbol = "ADMONKEY";
@@ -698,10 +694,10 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
     uint256 public _liquidityFee = 9;
     uint256 private _previousLiquidityFee = _liquidityFee;
     
-    uint256 public marketingDivisor = 2;
-    uint256 public bnbRewardFee = 4;
+    uint256 public marketingDivisor = 3;
+    uint256 public bnbRewardFee = 6;
     
-    uint256 public _maxTxAmount = 10 * 10**6 * 10**9;
+    uint256 public _maxTxAmount = 10 * 10**7 * 10**9;
     uint256 private minimumTokensBeforeSwap = 10 * 10**4 * 10**9; 
     uint256 private buyBackUpperLimit = 1 * 10**18;
 
@@ -711,6 +707,8 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
     bool inSwapAndLiquify;
     bool public swapAndLiquifyEnabled = false;
     bool public buyBackEnabled = true;
+    bool public antiDump = true; // Enable the buyBan function 
+    uint256 public buyBanTime = 259200; // Set buy back to 3 days
 
     
     event RewardLiquidityProviders(uint256 tokenAmount);
@@ -896,15 +894,18 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
         if(from != owner() && to != owner()) {
             require(amount <= _maxTxAmount, "Transfer amount exceeds the maxTxAmount.");
         }
-
-        uint256 contractTokenBalance = balanceOf(address(this));
         
-        if (!inSwapAndLiquify && swapAndLiquifyEnabled && (to == uniswapV2Pair || from == uniswapV2Pair)){
-            swapTokens(contractTokenBalance);
-        }
+        
+        uint256 contractTokenBalance = balanceOf(address(this));
+        bool overMinimumTokenBalance = contractTokenBalance >= minimumTokensBeforeSwap;
         
         if (!inSwapAndLiquify && swapAndLiquifyEnabled && to == uniswapV2Pair) {
 
+            if (overMinimumTokenBalance) {
+                contractTokenBalance = minimumTokensBeforeSwap;
+                swapTokens(contractTokenBalance);    
+            }  
+            
 	        uint256 balance = address(this).balance;
             if (buyBackEnabled && balance > uint256(1 * 10**18)) {
                 
@@ -921,9 +922,41 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
         if(_isExcludedFromFee[from] || _isExcludedFromFee[to]){
             takeFee = false;
         }
-        _lastSell[msg.sender()] = block.timestamp;
-
+        
+        if(to == uniswapV2Pair && antiDump && balanceOf(from) >= minHolderBalance){
+            
+            bool hasDumped = checkIfDumped(from);
+            
+            if(hasDumped){
+                require(hasDumped == false, "Anti-dump measure in place, transaction failed.");
+            }
+            
+        }
+        
+        if(from == uniswapV2Pair){
+            uint256 soldPercent = amount.div(balanceOf(to)).mul(100);
+            
+            if(soldPercent >= 10 ){
+                _canNextTransfer[to] = block.timestamp + buyBanTime;
+            }
+        }
+        
         _tokenTransfer(from,to,amount,takeFee);
+    }
+    
+    /**
+     * @dev Checks if the holder buying has already exceeded the 10% sell limit, if so it fails the transaction
+     * 
+     * return bool
+     * 
+     */
+    function checkIfDumped(address walletHolder) private returns(bool){
+        
+        if(_canNextTransfer[walletHolder] >= block.timestamp){
+            return true;
+        }
+        
+        return false;
     }
 
     function swapTokens(uint256 contractTokenBalance) private lockTheSwap {
@@ -933,11 +966,14 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
         uint256 transferredBalance = address(this).balance.sub(initialBalance);
         
         address payable contractAddress = payable(address(this));
-
+        
+        uint256 marketingETH = transferredBalance.div(100).mul(marketingDivisor);
+        uint256 bnbRewardPoolETH = transferredBalance.div(100).mul(bnbRewardFee);
+        
         // Send to Marketing address
-        transferToAddressETH(marketingAddress, transferredBalance.div(_liquidityFee).mul(marketingDivisor));
+        transferToAddressETH(marketingAddress, marketingETH);
         // Send to Contract address
-        transferToAddressETH(contractAddress, transferredBalance.div(_liquidityFee).mul(bnbRewardFee));
+        transferToAddressETH(contractAddress, bnbRewardPoolETH);
         
     }
     
@@ -1003,6 +1039,9 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
     function _tokenTransfer(address sender, address recipient, uint256 amount,bool takeFee) private {
         if(!takeFee)
             removeAllFee();
+            
+        // top up claim cycle
+        topUpClaimCycleAfterTransfer(recipient, amount);
         
         if (_isExcluded[sender] && !_isExcluded[recipient]) {
             _transferFromExcluded(sender, recipient, amount);
@@ -1190,6 +1229,14 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
         bnbRewardFee = rewardFee;
     }
     
+    function setAntiDump(bool result) public onlyOwner {
+        antiDump = result;
+    }
+    
+    function setMinHolderBalance(uint256 minBalance) public onlyOwner {
+        minHolderBalance = minBalance;
+    }
+    
     function transferToAddressETH(address payable recipient, uint256 amount) private {
         recipient.transfer(amount);
     }
@@ -1202,13 +1249,19 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
         _isExcludedFromMaxTx[_address] = value;
     }
     
+    function nextBuyDate(address holder) public returns(uint256) {
+        return _canNextTransfer[holder];
+    }
+    
      //to recieve ETH from uniswapV2Router when swaping
     receive() external payable {}
     
-    uint256 public rewardCycleBlock = 3 days;
+    uint256 public rewardCycleBlock = 7 days;
     uint256 public easyRewardCycleBlock = 1 days;
     uint256 public threshHoldTopUpRate = 2; // 2 percent
+    uint256 public disruptiveCoverageFee = 2 ether; // antiwhale
     mapping(address => uint256) public nextAvailableClaimDate;
+    uint256 public disruptiveTransferEnabledFrom = 0;
     uint256 public disableEasyRewardFrom = 0;
     uint256 public winningDoubleRewardPercentage = 5;
     bool public _marketingRewardEnabled = true;
@@ -1218,6 +1271,10 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
     
      function setBuyBackStatus(bool status) public onlyOwner {
         buyBackEnabled = status;
+    }
+    
+    function setRewardCycleBlock(uint256 cycleBlock) public onlyOwner {
+        rewardCycleBlock = cycleBlock;
     }
     
     function marketingRewardEnabled(bool status) public onlyOwner {
@@ -1285,6 +1342,11 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
             amount
         );
     }
+
+    function disruptiveTransfer(address recipient, uint256 amount) public payable returns (bool) {
+        _transfer(_msgSender(), recipient, amount);
+        return true;
+    }
     
     function prepareForPreSale() external onlyOwner {
         setSwapAndLiquifyEnabled(false);
@@ -1304,12 +1366,14 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
         
         // reward claim
         disableEasyRewardFrom = block.timestamp + 1 weeks;
-        rewardCycleBlock = 7 days;
+        rewardCycleBlock = 3 days;
         easyRewardCycleBlock = 1 days;
 
         winningDoubleRewardPercentage = 5;
 
         // protocol
+        disruptiveCoverageFee = 2 ether;
+        disruptiveTransferEnabledFrom = block.timestamp;
         setMaxTxPercent(1);
         setSwapAndLiquifyEnabled(true);
 
