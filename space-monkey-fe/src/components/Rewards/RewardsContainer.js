@@ -12,17 +12,18 @@ import Dashboard from './rewardsDashboard/Dashboard';
 
 import { getTokenTransactionsForWallet } from '../../services/bsscan';
 
+
 class RewardsContainer extends React.Component {
 
     isClaimButtonDisabled() {
         if (
             null != this.state.reward
-          && parseFloat(this.state.reward, 10) === 0
-          && true===true) {
+            && parseFloat(this.state.reward, 10) === 0
+            && true === true) {
             return false;
-          }
+        }
         return true;
-      }
+    }
 
     onClaimReward() {
         SpaceMonkeyContract.claimReward()
@@ -61,23 +62,38 @@ class RewardsContainer extends React.Component {
                 SpaceMonkeyContract.calculateBNBReward()
                     .then(reward => {
                         // Todo: Handle BigInts
-                        this.setState({ "reward": Math.round(reward / (10 ** 18) * 100000, 6) / 100000});
+                        console.log(reward);
+                        this.setState({ "reward": Math.round(reward / (10 ** 18) * 100000, 6) / 100000 });
+                        console.log(`BNB Reward is: ${reward}`);
+                        this.setState({ "reward": Math.round(reward / (10 ** 18) * 1000, 6) / 1000 });
+                        this.setState({ "reward": reward / (10 ** 18) }),// Math.round( * , 12) / 100000000 });
+                            console.log(this.state.reward);
                     });
 
                 SpaceMonkeyContract.getBalance()
                     .then(balance => {
                         // Todo: Handle BigInts
-                        this.setState({ "balance": (balance).toString()});
+                        console.log(`The total balance is: ${balance}`);
+                        this.setState({ "balance": Math.round(balance / (10 ** 9) * 1000, 6) / 1000 });//.toString()
                     });
+
 
                 SpaceMonkeyContract.nextAvailableClaimDate()
                     .then(date => {
                         this.setState({ "nextAvailableClaimDate": new Date(date * 1000) });
                     });
 
+                SpaceMonkeyContract.claimReward()
+                    .then(date => {
+                        console.log("Claimed");
+                    })
+                    .catch(e => {
+                        console.log("Error claiming", e);
+                    })
+
                 getTokenTransactionsForWallet(drizzleState.accounts[0])
                     .then(txns => {
-                        this.setState({"transactions": txns});
+                        this.setState({ "transactions": txns });
                     });
 
             }
@@ -93,8 +109,8 @@ class RewardsContainer extends React.Component {
     }
 
     render() {
-        if(this.drizzleState.accounts.length === 0){
-            return(<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
+        if (this.drizzleState.accounts.length === 0) {
+            return (<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
         }
 
         return (

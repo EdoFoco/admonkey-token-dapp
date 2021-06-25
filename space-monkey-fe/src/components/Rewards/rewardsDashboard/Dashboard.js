@@ -18,20 +18,21 @@ import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
+import { mainListItems } from './ListItems';
 import PropTypes from 'prop-types';
 import ClaimReward from './ClaimReward';
 import Rewards from './Rewards';
 import Transactions from './Transactions';
 import RfiReward from './RfiReward';
 import Balance from './Balance';
+import Logo from '../../../assets/admonkey-logo.png';
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
-        Spacemonkey
+        AdMonkey
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -57,11 +58,15 @@ const useStyles = makeStyles((theme) => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    background: 'linear-gradient(45deg, #1f3a93 20%, #9a12b3 90%)',
+    background: 'linear-gradient(45deg, rgb(42,22,13) 20%, rgb(184,89,52) 90%)',
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+  },
+  logo: {
+    maxWidth: "150px",
+    width: "100%"
   },
   appBarShift: {
     marginLeft: drawerWidth,
@@ -122,7 +127,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const calculateReflectionReward = (balance, transactions) => {
-  const balanceValue = Number(balance);
+  const balanceValue = Number(balance * 10 ** 9);
   let investment = 0;
   for (let i = 0; i < transactions.length; i++) {
     const value = Number(transactions[i].value);
@@ -133,7 +138,9 @@ const calculateReflectionReward = (balance, transactions) => {
       investment -= value;
   }
 
-  return balanceValue - investment;
+  let result = balanceValue - investment;
+  result = result / 10 ** 9 * 1000, 8 / 1000;
+  return Math.round(result);
 }
 
 export default function Dashboard(props) {
@@ -168,7 +175,7 @@ export default function Dashboard(props) {
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Ad Monkey
+            Investor Dashboard
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
@@ -189,10 +196,13 @@ export default function Dashboard(props) {
             <ChevronLeftIcon />
           </IconButton>
         </div>
-        <Divider />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <img src={Logo} className={clsx(classes.logo)} />
+        </div>
+
+        < Divider />
         <List>{mainListItems}</List>
         <Divider />
-        {/* <List>{secondaryListItems}</List> */}
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -200,18 +210,7 @@ export default function Dashboard(props) {
           <Grid container spacing={3}>
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
-                <ClaimReward
-                  reward={reward}
-                  balance={balance}
-                  nextAvailableClaimDate={nextAvailableClaimDate}
-                  onClaimReward={onClaimReward}
-                  disabled={isClaimButtonDisabled}
-                />
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={3} lg={4}>
-              <Paper className={fixedHeightPaper}>
-                <Rewards reward={reward} balance={balance} nextAvailableClaimDate={nextAvailableClaimDate} />
+                <Balance balance={balance} />
               </Paper>
             </Grid>
             <Grid item xs={12} md={3} lg={4}>
@@ -221,7 +220,12 @@ export default function Dashboard(props) {
             </Grid>
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
-                <Balance balance={balance} />
+                <Rewards reward={reward}
+                  balance={balance}
+                  nextAvailableClaimDate={nextAvailableClaimDate}
+                  onClaimReward={onClaimReward}
+                  disabled={isClaimButtonDisabled}
+                />
               </Paper>
             </Grid>
             <Grid item xs={12}>

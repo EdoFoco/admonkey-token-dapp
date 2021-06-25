@@ -30,7 +30,7 @@ const SpaceMonkeyContract = {
         const myAcct = store.getState().accounts[0];
 
         const { SpaceMonkey } = this.drizzle.contracts;
-        return await SpaceMonkey.methods.balanceOf(myAcct).call();
+        return await SpaceMonkey.methods.claimBNBReward().call();
     },
 
     nextAvailableClaimDate: async function () {

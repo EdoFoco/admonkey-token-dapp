@@ -1,12 +1,12 @@
 import React from 'react';
-import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Title from './Title';
 import PropTypes from 'prop-types';
 import { format } from 'date-fns'
-import Money from '../images/money/Money'
+import Button from '@material-ui/core/Button';
+import Money from '../images/money/Money';
 
 function preventDefault(event) {
   event.preventDefault();
@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 });
 
 export default function Rewards(props) {
-  const { reward, nextAvailableClaimDate } = props;
+  const { reward, nextAvailableClaimDate, disabled, onClaimReward } = props;
   const classes = useStyles();
   return (
     <>
@@ -47,11 +47,16 @@ export default function Rewards(props) {
       <Typography color="textSecondary" className={classes.depositContext}>
         on {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'do MMM yyyy') : ''}
       </Typography>
-      <div>
-        <Link color="primary" href="#" onClick={preventDefault}>
-          View balance
-        </Link>
-      </div>
+      <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        disabled={disabled}
+        onClick={() => { onClaimReward() }}
+      >
+        {reward}
+        {/* {this.state.reward} */}
+      </Button>
     </>
   );
 }
@@ -60,4 +65,6 @@ Rewards.propTypes = {
   rewards: PropTypes.string,
   nextAvailableClaimDate: PropTypes.instanceOf(Date),
   balance: PropTypes.string,
+  onClaimReward: PropTypes.func.isRequired,
+  disabled: PropTypes.bool
 };
