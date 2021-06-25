@@ -15,58 +15,58 @@ import _ from 'lodash';
 class RewardsContainer extends React.Component {
 
   constructor(props) {
-      super(props);
+    super(props);
 
-      const { drizzle, drizzleState, initialized } = props.drizzleContext;
-      this.web3 = drizzle.web3;
-      this.contracts = drizzle.contracts;
-      this.drizzleState = drizzleState;
+    const { drizzle, drizzleState, initialized } = props.drizzleContext;
+    this.web3 = drizzle.web3;
+    this.contracts = drizzle.contracts;
+    this.drizzleState = drizzleState;
 
-      this.state = {
-          initialized: false,
-          reward: null,
-          balance: null,
-          nextAvailableClaimDate: null,
-          transactions: []
-      };
+    this.state = {
+      initialized: false,
+      reward: null,
+      balance: null,
+      nextAvailableClaimDate: null,
+      transactions: []
+    };
   }
 
   componentDidMount() {
-      const { drizzle } = this.props.drizzleContext;
+    const { drizzle } = this.props.drizzleContext;
 
-      this.unsubscribe = drizzle.store.subscribe(() => {
-          const drizzleState = drizzle.store.getState();
+    this.unsubscribe = drizzle.store.subscribe(() => {
+      const drizzleState = drizzle.store.getState();
 
-          if (drizzleState.drizzleStatus.initialized && !this.state.initialized) {
-              this.setState({ initialized: true });
+      if (drizzleState.drizzleStatus.initialized && !this.state.initialized) {
+        this.setState({ initialized: true });
 
-              SpaceMonkeyContract.drizzle = drizzle;
-              SpaceMonkeyContract.calculateBNBReward()
-                  .then(reward => {
-                      // Todo: Handle BigInts
-                      this.setState({ "reward": Math.round(reward / (10 ** 18) * 100000, 6) / 100000});
-                  });
-          }
-      });
+        SpaceMonkeyContract.drizzle = drizzle;
+        SpaceMonkeyContract.calculateBNBReward()
+          .then(reward => {
+            // Todo: Handle BigInts
+            this.setState({ "reward": Math.round(reward / (10 ** 18) * 100000, 6) / 100000 });
+          });
+      }
+    });
   }
 
   componentWillUnmount() {
-      this.unsubscribe();
+    this.unsubscribe();
   }
 
-    // replace true === true with date calc
-    isButtonDisabled() {
-      if (null != this.state.reward
-        && parseFloat(this.state.reward, 10) === 0
-        && true===true) {
-          return false;
-        }
-      return true;
+  // replace true === true with date calc
+  isButtonDisabled() {
+    if (null != this.state.reward
+      && parseFloat(this.state.reward, 10) === 0
+      && true === true) {
+      return false;
     }
+    return true;
+  }
 
   render() {
-    if(this.drizzleState.accounts.length === 0){
-        return(<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
+    if (this.drizzleState.accounts.length === 0) {
+      return (<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
     }
 
     return (
@@ -77,9 +77,10 @@ class RewardsContainer extends React.Component {
           onClick={
             () => {
               SpaceMonkeyContract.claimReward()
-                    .then(reward => {
-                        console.log('here is your fucking reward you dirty scammer: ', reward);
-                    })
+                .then(reward => {
+                  console.log('here is your fucking reward you dirty scammer: ', reward);
+                })
+                .catch(e => { console.log(e) });
             }
           }
         >
