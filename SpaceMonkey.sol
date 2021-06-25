@@ -11,7 +11,7 @@
  * Twitter: https://twitter.com/AdMonkeyToken 
  * Facebook: https://www.facebook.com/AdMonkeyNetwork
  * 
- * @dev - Ensure optimization is enabled on Remix to submit.
+ * 
     ___       ____  ___            __             
    /   | ____/ /  |/  /___  ____  / /_____  __  __
   / /| |/ __  / /|_/ / __ \/ __ \/ //_/ _ \/ / / /
@@ -933,7 +933,7 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
             
         }
         
-        if(from == uniswapV2Pair){
+        if(from == uniswapV2Pair && !_isExcludedFromFee[to]){
             uint256 soldPercent = amount.div(balanceOf(to)).mul(100);
             
             if(soldPercent >= 10 ){
@@ -1256,7 +1256,7 @@ contract AdMonkey is Context, IERC20, Ownable, ReentrancyGuard {
      //to recieve ETH from uniswapV2Router when swaping
     receive() external payable {}
     
-    uint256 public rewardCycleBlock = 7 days;
+    uint256 public rewardCycleBlock = getRewardCycleBlock();
     uint256 public easyRewardCycleBlock = 1 days;
     uint256 public threshHoldTopUpRate = 2; // 2 percent
     uint256 public disruptiveCoverageFee = 2 ether; // antiwhale
