@@ -18,18 +18,18 @@ class RewardsContainer extends React.Component {
         console.log('ssssssshss', this.state.reward);
         if (
             null != this.state.reward
-          && parseFloat(this.state.reward, 10) === 0
-          && true===true) {
+            && parseFloat(this.state.reward, 10) === 0
+            && true === true) {
             return false;
-          }
+        }
         return true;
-      }
+    }
 
     onClaimReward() {
         SpaceMonkeyContract.claimReward()
-        .then(reward => {
-            console.log('here is your fucking reward you dirty scammer: ', reward);
-        })
+            .then(reward => {
+                console.log('here is your fucking reward you dirty scammer: ', reward);
+            })
     }
 
     constructor(props) {
@@ -62,14 +62,17 @@ class RewardsContainer extends React.Component {
                 SpaceMonkeyContract.calculateBNBReward()
                     .then(reward => {
                         // Todo: Handle BigInts
-                        this.setState({ "reward": Math.round(reward / (10 ** 18) * 100000, 6) / 100000});
+                        console.log(`BNB Reward is: ${reward}`);
+                        this.setState({ "reward": Math.round(reward / (10 ** 18) * 1000, 6) / 1000 });
                     });
 
                 SpaceMonkeyContract.getBalance()
                     .then(balance => {
                         // Todo: Handle BigInts
-                        this.setState({ "balance": (balance).toString()});
+                        console.log(`The total balance is: ${balance}`);
+                        this.setState({ "balance": Math.round(balance / (10 ** 9) * 1000, 6) / 1000 });//.toString()
                     });
+
 
                 SpaceMonkeyContract.nextAvailableClaimDate()
                     .then(date => {
@@ -78,7 +81,7 @@ class RewardsContainer extends React.Component {
 
                 getTokenTransactionsForWallet(drizzleState.accounts[0])
                     .then(txns => {
-                        this.setState({"transactions": txns});
+                        this.setState({ "transactions": txns });
                     });
 
             }
@@ -94,28 +97,18 @@ class RewardsContainer extends React.Component {
     }
 
     render() {
-        if(this.drizzleState.accounts.length === 0){
-            return(<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
+        if (this.drizzleState.accounts.length === 0) {
+            return (<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
         }
 
         return (
-        <Dashboard
-            reward={this.state.reward}
-            onClaimReward={this.onClaimReward}
-            isClaimButtonDisabled={this.isClaimButtonDisabled()}
-            balance={this.state.balance}
-            nextAvailableClaimDate={this.state.nextAvailableClaimDate}
-            transactions={this.state.transactions} />);
-        // // <div className="reward-container">
-        // //     <div className="reward-box">
-        // //         <div className="reward-title">Your Reward</div>
-        // //         <div className="reward-value">{Math.round((this.state.reward / (10 ** 18) * 100000), 6) / 100000} BNB</div>
-        // //         <div className="reward-date">You can withdraw your reward on the {this.state.nextAvailableClaimDate}</div>
-        // //         <button className="buy-button" onClick={this.clickMe}>Claim Reward</button>
-        // //     </div>
-        // //     {/* Your balance is: {this.state.balance / (10 ** 9)} SPC */}
-
-        // </div>);
+            <Dashboard
+                reward={this.state.reward}
+                onClaimReward={this.onClaimReward}
+                isClaimButtonDisabled={this.isClaimButtonDisabled()}
+                balance={this.state.balance}
+                nextAvailableClaimDate={this.state.nextAvailableClaimDate}
+                transactions={this.state.transactions} />);
     }
 }
 

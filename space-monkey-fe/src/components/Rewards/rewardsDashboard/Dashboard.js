@@ -122,7 +122,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const calculateReflectionReward = (balance, transactions) => {
-  const balanceValue = Number(balance);
+  const balanceValue = Number(balance * 10 ** 9);
   let investment = 0;
   for (let i = 0; i < transactions.length; i++) {
     const value = Number(transactions[i].value);
@@ -133,7 +133,9 @@ const calculateReflectionReward = (balance, transactions) => {
       investment -= value;
   }
 
-  return balanceValue - investment;
+  let result = balanceValue - investment;
+  result = result / 10 ** 9 * 1000, 8 / 1000;
+  return Math.round(result);
 }
 
 export default function Dashboard(props) {
@@ -168,7 +170,7 @@ export default function Dashboard(props) {
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Ad Monkey
+            Investor Dashboard
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
@@ -192,7 +194,6 @@ export default function Dashboard(props) {
         <Divider />
         <List>{mainListItems}</List>
         <Divider />
-        {/* <List>{secondaryListItems}</List> */}
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -200,18 +201,7 @@ export default function Dashboard(props) {
           <Grid container spacing={3}>
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
-                <ClaimReward
-                  reward={reward}
-                  balance={balance}
-                  nextAvailableClaimDate={nextAvailableClaimDate}
-                  onClaimReward={onClaimReward}
-                  disabled={isClaimButtonDisabled}
-                />
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={3} lg={4}>
-              <Paper className={fixedHeightPaper}>
-                <Rewards reward={reward} balance={balance} nextAvailableClaimDate={nextAvailableClaimDate} />
+                <Balance balance={balance} />
               </Paper>
             </Grid>
             <Grid item xs={12} md={3} lg={4}>
@@ -221,7 +211,12 @@ export default function Dashboard(props) {
             </Grid>
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
-                <Balance balance={balance} />
+                <Rewards reward={reward}
+                  balance={balance}
+                  nextAvailableClaimDate={nextAvailableClaimDate}
+                  onClaimReward={onClaimReward}
+                  disabled={isClaimButtonDisabled}
+                />
               </Paper>
             </Grid>
             <Grid item xs={12}>
