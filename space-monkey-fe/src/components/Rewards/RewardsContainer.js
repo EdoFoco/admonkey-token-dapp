@@ -15,7 +15,6 @@ import { getTokenTransactionsForWallet } from '../../services/bsscan';
 class RewardsContainer extends React.Component {
 
     isClaimButtonDisabled() {
-        console.log('ssssssshss', this.state.reward);
         if (
             null != this.state.reward
           && parseFloat(this.state.reward, 10) === 0
@@ -28,7 +27,7 @@ class RewardsContainer extends React.Component {
     onClaimReward() {
         SpaceMonkeyContract.claimReward()
         .then(reward => {
-            console.log('here is your fucking reward you dirty scammer: ', reward);
+            console.log('here is your reward: ', reward);
         })
     }
 

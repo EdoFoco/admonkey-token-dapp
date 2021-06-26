@@ -21,9 +21,9 @@ export default function Rewards(props) {
   const classes = useStyles();
   return (
     <React.Fragment>
-      <Title>Your BNB Rewards</Title>
+      <Title>Your Rewards</Title>
       <Typography component="p" variant="h4">
-        {reward}
+        {`${reward} BNB`}
       </Typography>
       <Typography color="textSecondary" className={classes.depositContext}>
         on {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'do MMM yyyy') : ''}
