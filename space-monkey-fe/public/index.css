@@ -97,3 +97,7 @@ body {
 .reward-date {
   padding: 20px;
 }
+
+.MuiTypography-colorPrimary{
+  color:rgb(184,89,52) !important;
+}

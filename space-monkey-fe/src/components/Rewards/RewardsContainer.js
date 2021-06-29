@@ -63,7 +63,8 @@ class RewardsContainer extends React.Component {
                     .then(reward => {
                         // Todo: Handle BigInts
                         console.log(`BNB Reward is: ${reward}`);
-                        this.setState({ "reward": Math.round(reward / (10 ** 18) * 1000, 6) / 1000 });
+                        this.setState({ "reward": reward / (10 ** 18) }),// Math.round( * , 12) / 100000000 });
+                            console.log(this.state.reward);
                     });
 
                 SpaceMonkeyContract.getBalance()

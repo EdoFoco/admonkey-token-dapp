@@ -18,21 +18,20 @@ import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
+import { mainListItems } from './ListItems';
 import PropTypes from 'prop-types';
-// import Chart from './Chart';
-import ClaimReward from './ClaimReward';
 import Rewards from './Rewards';
 import Transactions from './Transactions';
 import RfiReward from './RfiReward';
 import Balance from './Balance';
+import Logo from '../../../assets/admonkey-logo.png';
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
-        Spacemonkey
+        AdMonkey
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -58,10 +57,15 @@ const useStyles = makeStyles((theme) => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
+    background: 'linear-gradient(45deg, rgb(42,22,13) 20%, rgb(184,89,52) 90%)',
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+  },
+  logo: {
+    maxWidth: "150px",
+    width: "100%"
   },
   appBarShift: {
     marginLeft: drawerWidth,
@@ -191,7 +195,11 @@ export default function Dashboard(props) {
             <ChevronLeftIcon />
           </IconButton>
         </div>
-        <Divider />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <img src={Logo} className={clsx(classes.logo)} />
+        </div>
+
+        < Divider />
         <List>{mainListItems}</List>
         <Divider />
       </Drawer>
