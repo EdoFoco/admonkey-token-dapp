@@ -6,11 +6,7 @@ import Title from './Title';
 import PropTypes from 'prop-types';
 import { format } from 'date-fns'
 import Button from '@material-ui/core/Button';
-import Money from '../images/money/Money';
-
-function preventDefault(event) {
-  event.preventDefault();
-}
+import Reward from '../images/reward/Reward';
 
 const useStyles = makeStyles({
   depositContext: {
@@ -37,15 +33,15 @@ export default function Rewards(props) {
           <Grid container spacing={3}>
             <Grid item xs={3} />
             <Grid item xs={6}>
-              <Money />
+              <Reward />
             </Grid>
           <Grid item xs={3} />
     </Grid>
-      <Typography component="p" variant="h4" className={classes.centered}>
+      <Typography component="p" variant="h5" className={classes.centered}>
         {`${reward} BNB`}
       </Typography>
       <Typography color="textSecondary" className={classes.depositContext}>
-        on {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'do MMM yyyy') : ''}
+        Next claim date {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'do MMM yyyy') : ''}
       </Typography>
       <Button
         variant="contained"

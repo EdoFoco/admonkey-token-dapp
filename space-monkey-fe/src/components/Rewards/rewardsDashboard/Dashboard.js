@@ -18,7 +18,7 @@ import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems } from './ListItems';
+import { mainListItems } from './listItems';
 import PropTypes from 'prop-types';
 import ClaimReward from './ClaimReward';
 import Rewards from './Rewards';
@@ -208,6 +208,16 @@ export default function Dashboard(props) {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
+          <Grid item xs={12} md={3} lg={4}>
+              <Paper className={fixedHeightPaper}>
+                <Rewards reward={reward}
+                  balance={balance}
+                  nextAvailableClaimDate={nextAvailableClaimDate}
+                  onClaimReward={onClaimReward}
+                  disabled={isClaimButtonDisabled}
+                />
+              </Paper>
+            </Grid>
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
                 <Balance balance={balance} />
@@ -216,16 +226,6 @@ export default function Dashboard(props) {
             <Grid item xs={12} md={3} lg={4}>
               <Paper className={fixedHeightPaper}>
                 <RfiReward rfiReward={rfiReward} />
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={3} lg={4}>
-              <Paper className={fixedHeightPaper}>
-                <Rewards reward={reward}
-                  balance={balance}
-                  nextAvailableClaimDate={nextAvailableClaimDate}
-                  onClaimReward={onClaimReward}
-                  disabled={isClaimButtonDisabled}
-                />
               </Paper>
             </Grid>
             <Grid item xs={12}>
