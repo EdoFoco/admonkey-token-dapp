@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import reward from './reward.png'
+import money from './money.png'
 
 const useStyles = makeStyles({
   root: {
@@ -14,7 +14,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function Reward({}) {
+export default function Money({}) {
   const classes = useStyles();
 
   return (
@@ -22,15 +22,15 @@ export default function Reward({}) {
     <img
       className={classes.root}
       alt=""
-      src={reward}
+      src={money}
     />
   </div>
   );
 }
 
-Reward.defaultProps = {
+Money.defaultProps = {
 
 };
 
-Reward.propTypes = {
+Money.propTypes = {
 };

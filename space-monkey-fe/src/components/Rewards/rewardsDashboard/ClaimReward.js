@@ -16,7 +16,7 @@ const useStyles = makeStyles({
     height: 48,
     padding: '0 30px',
   },
-  title:{
+  centered:{
     marginLeft: 'auto',
     marginRight: 'auto',
   },
@@ -31,7 +31,7 @@ export default function RewardsContainer({reward, onClaimReward, disabled}) {
 
   return (
   <>
-    <div className={classes.title}>
+    <div className={classes.centered}>
       <Title>
         CLAIM YOUR REWARD
       </Title>
