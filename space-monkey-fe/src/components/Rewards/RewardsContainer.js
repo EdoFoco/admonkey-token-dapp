@@ -15,7 +15,6 @@ import { getTokenTransactionsForWallet } from '../../services/bsscan';
 class RewardsContainer extends React.Component {
 
     isClaimButtonDisabled() {
-        console.log('ssssssshss', this.state.reward);
         if (
             null != this.state.reward
             && parseFloat(this.state.reward, 10) === 0
