@@ -7,7 +7,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import useWeb3Modal from "../../../hooks/useWeb3Modal";
 
 const drawerWidth = 240;
 
@@ -113,11 +112,7 @@ function WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal }) {
 }
 
 export default function Navbar(props) {
-  const { setInvalidChain } = props;
-
-  const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal({
-    setInvalidChain: setInvalidChain,
-  });
+  const { loadWeb3Modal, logoutOfWeb3Modal, provider } = props;
 
   const classes = useStyles();
   const handleDrawerOpen = () => {

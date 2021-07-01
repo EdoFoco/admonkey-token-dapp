@@ -7,8 +7,10 @@ function useWeb3Modal(config = {}) {
   const [provider, setProvider] = useState();
   const [autoLoaded, setAutoLoaded] = useState(false);
   const [signedInAddress, setSignedInAddress] = useState("");
+
   const { autoLoad = true } = config;
-  const { setInvalidChain } = config;
+  const { setInvalidChain, setInitialized, onLoad } = config;
+
   const rpcOptions = {};
   rpcOptions[process.env.REACT_APP_CHAIN_ID] =
     process.env.REACT_APP_BSC_RPC_ENDPOINT;
@@ -26,15 +28,22 @@ function useWeb3Modal(config = {}) {
           description: "Connect with Wallet Connect",
         },
       },
+      injected: {
+        display: {
+          name: "Injected",
+          description: "Connect with the provider in your Browser",
+        },
+        package: null,
+      },
     },
   });
 
-  const setProviderEvents = (provider) => {
-    provider.on("accountsChanged", (accounts) => {
+  const setProviderEvents = (newProvider) => {
+    newProvider.on("accountsChanged", (accounts) => {
       console.log(accounts);
     });
 
-    provider.on("chainChanged", (chainId) => {
+    newProvider.on("chainChanged", (chainId) => {
       if (parseInt(chainId) != process.env.REACT_APP_CHAIN_ID) {
         setInvalidChain(true);
       } else {
@@ -49,9 +58,13 @@ function useWeb3Modal(config = {}) {
       setInvalidChain(true);
     }
 
-    setProvider(new Web3Provider(newProvider));
+    const web3Provider = new Web3Provider(newProvider);
+    console.log(web3Provider);
+
+    setProvider(web3Provider);
     setSignedInAddress(newProvider.selectedAddress);
     setProviderEvents(newProvider);
+    onLoad(web3Provider, newProvider.selectedAddress);
   }, [web3Modal]);
 
   const logoutOfWeb3Modal = useCallback(

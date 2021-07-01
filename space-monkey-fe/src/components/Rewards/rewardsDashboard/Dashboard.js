@@ -21,7 +21,6 @@ import Transactions from "./Transactions";
 import RfiReward from "./RfiReward";
 import Balance from "./Balance";
 import Logo from "../../../assets/admonkey-logo.png";
-import InvalidChainError from "./InvalidChainError";
 
 function Copyright() {
   return (
@@ -177,36 +176,46 @@ const Menu = () => {
 
 export default function Dashboard(props) {
   const classes = useStyles();
-  const [chainErrorModalOpen, setChainErrorModalOpen] = React.useState(false);
-
-  const handleChainErrorModalClose = () => {
-    setChainErrorModalOpen(false);
-  };
-
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   const {
+    initialized,
     reward,
     onClaimReward,
     isClaimButtonDisabled,
     balance,
     nextAvailableClaimDate,
     transactions,
+    invalidChain,
+    provider,
+    loadWeb3Modal,
+    logoutOfWeb3Modal,
+    loading,
   } = props;
+
+  console.log(props);
   let rfiReward = 0;
 
   if (balance && transactions.length > 0) {
     rfiReward = calculateReflectionReward(balance, transactions);
   }
 
-  if (chainErrorModalOpen) {
+  if (invalidChain || !initialized) {
     return (
       <div className={classes.root}>
         <CssBaseline />
-        <Navbar setInvalidChain={setChainErrorModalOpen} />
+        <Navbar
+          loadWeb3Modal={loadWeb3Modal}
+          logoutOfWeb3Modal={logoutOfWeb3Modal}
+          provider={provider}
+        />
         <Menu />
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-          <InvalidChainError />
+          {!initialized ? (
+            <h1>You must connect to a wallet</h1>
+          ) : (
+            <h1>You must be on chain {process.env.REACT_APP_CHAIN_ID}</h1>
+          )}
         </main>
       </div>
     );
@@ -214,7 +223,11 @@ export default function Dashboard(props) {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Navbar setInvalidChain={setChainErrorModalOpen} />
+      <Navbar
+        loadWeb3Modal={loadWeb3Modal}
+        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        provider={provider}
+      />
       <Menu />
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
