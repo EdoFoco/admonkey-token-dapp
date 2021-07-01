@@ -20,6 +20,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems } from './ListItems';
 import PropTypes from 'prop-types';
+import ClaimReward from './ClaimReward';
 import Rewards from './Rewards';
 import Transactions from './Transactions';
 import RfiReward from './RfiReward';
