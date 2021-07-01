@@ -34,10 +34,10 @@ class RewardsContainer extends React.Component {
     constructor(props) {
         super(props);
 
-        const { drizzle, drizzleState, initialized } = props.drizzleContext;
-        this.web3 = drizzle.web3;
-        this.contracts = drizzle.contracts;
-        this.drizzleState = drizzleState;
+        // const { drizzle, drizzleState, initialized } = props.drizzleContext;
+        // this.web3 = drizzle.web3;
+        // this.contracts = drizzle.contracts;
+        // this.drizzleState = drizzleState;
 
         this.state = {
             initialized: false,
@@ -49,43 +49,43 @@ class RewardsContainer extends React.Component {
     }
 
     componentDidMount() {
-        const { drizzle } = this.props.drizzleContext;
+        // const { drizzle } = this.props.drizzleContext;
 
-        this.unsubscribe = drizzle.store.subscribe(() => {
-            const drizzleState = drizzle.store.getState();
+        // this.unsubscribe = drizzle.store.subscribe(() => {
+        //const drizzleState = drizzle.store.getState();
 
-            if (drizzleState.drizzleStatus.initialized && !this.state.initialized) {
-                this.setState({ initialized: true });
+        // if (drizzleState.drizzleStatus.initialized && !this.state.initialized) {
+        //     this.setState({ initialized: true });
 
-                SpaceMonkeyContract.drizzle = drizzle;
-                SpaceMonkeyContract.calculateBNBReward()
-                    .then(reward => {
-                        // Todo: Handle BigInts
-                        console.log(`BNB Reward is: ${reward}`);
-                        this.setState({ "reward": reward / (10 ** 18) }),// Math.round( * , 12) / 100000000 });
-                            console.log(this.state.reward);
-                    });
+        //     SpaceMonkeyContract.drizzle = drizzle;
+        //     SpaceMonkeyContract.calculateBNBReward()
+        //         .then(reward => {
+        //             // Todo: Handle BigInts
+        //             console.log(`BNB Reward is: ${reward}`);
+        //             this.setState({ "reward": reward / (10 ** 18) }),// Math.round( * , 12) / 100000000 });
+        //                 console.log(this.state.reward);
+        //         });
 
-                SpaceMonkeyContract.getBalance()
-                    .then(balance => {
-                        // Todo: Handle BigInts
-                        console.log(`The total balance is: ${balance}`);
-                        this.setState({ "balance": Math.round(balance / (10 ** 9) * 1000, 6) / 1000 });//.toString()
-                    });
+        //     SpaceMonkeyContract.getBalance()
+        //         .then(balance => {
+        //             // Todo: Handle BigInts
+        //             console.log(`The total balance is: ${balance}`);
+        //             this.setState({ "balance": Math.round(balance / (10 ** 9) * 1000, 6) / 1000 });//.toString()
+        //         });
 
 
-                SpaceMonkeyContract.nextAvailableClaimDate()
-                    .then(date => {
-                        this.setState({ "nextAvailableClaimDate": new Date(date * 1000) });
-                    });
+        //     SpaceMonkeyContract.nextAvailableClaimDate()
+        //         .then(date => {
+        //             this.setState({ "nextAvailableClaimDate": new Date(date * 1000) });
+        //         });
 
-                getTokenTransactionsForWallet(drizzleState.accounts[0])
-                    .then(txns => {
-                        this.setState({ "transactions": txns });
-                    });
+        //     getTokenTransactionsForWallet(drizzleState.accounts[0])
+        //         .then(txns => {
+        //             this.setState({ "transactions": txns });
+        //         });
 
-            }
-        });
+        // }
+        //});
     }
 
     componentWillUnmount() {
@@ -97,9 +97,9 @@ class RewardsContainer extends React.Component {
     }
 
     render() {
-        if (this.drizzleState.accounts.length === 0) {
-            return (<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
-        }
+        // if (this.drizzleState.accounts.length === 0) {
+        //     return (<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
+        // }
 
         return (
             <Dashboard
