@@ -1,17 +1,7 @@
-// external libraries
 import React, { useState } from "react";
-import _ from "lodash";
 import useWeb3Modal from "../../hooks/useWeb3Modal";
-import Web3 from "web3";
-// own services
-// import { withAppContextConsumer } from "../../services/app-context";
-// import { withDrizzleContextConsumer } from "../../services/drizzle";
-
-// smart contracts
 import Dashboard from "./rewardsDashboard/Dashboard";
 import AdMonkey from "../../contracts/AdMonkey";
-import AdMonkeyAbi from "../../contracts/AdMonkeyAbi.json";
-
 import { getTokenTransactionsForWallet } from "../../services/bsscan";
 
 export default function RewardsContainer() {
@@ -46,14 +36,6 @@ export default function RewardsContainer() {
   };
 
   const loadAdMonkey = async (provider, account) => {
-    // const newProvider = new Web3(provider.provider);
-    // console.log(newProvider);
-    // const contract = new newProvider.eth.Contract(
-    //   AdMonkeyAbi.abi,
-    //   process.env.REACT_APP_CONTRACT_ADDRESS
-    // );
-    // const b = await contract.methods["balanceOf"](account).call();
-    // console.log(b);
     if (provider) {
       const adMonkeyContract = new AdMonkey(provider.provider, account);
       await setAdMonkey(adMonkeyContract);
@@ -78,61 +60,6 @@ export default function RewardsContainer() {
     //   console.log("here is your fucking reward you dirty scammer: ", reward);
     // });
   };
-
-  //   constructor(props) {
-  //     super(props);
-
-  //     this.state = {
-  //       initialized: false,
-  //       reward: null,
-  //       balance: null,
-  //       nextAvailableClaimDate: null,
-  //       transactions: [],
-  //       invalidChain: false,
-  //       provider: null,
-  //       loadWeb3Modal: null,
-  //       logoutOfWeb3Modal: null,
-  //     };
-  //   }
-
-  //   componentDidMount() {
-
-  //     this.setState({
-  //       provider: provider,
-  //       loadWeb3Modal: loadWeb3Modal,
-  //       logoutOfWeb3Modal: logoutOfWeb3Modal,
-  //     });
-
-  // const { drizzle } = this.props.drizzleContext;
-  // this.unsubscribe = drizzle.store.subscribe(() => {
-  //const drizzleState = drizzle.store.getState();
-  // if (drizzleState.drizzleStatus.initialized && !this.state.initialized) {
-  //     this.setState({ initialized: true });
-  //     SpaceMonkeyContract.drizzle = drizzle;
-  //     SpaceMonkeyContract.calculateBNBReward()
-  //         .then(reward => {
-  //             // Todo: Handle BigInts
-  //             console.log(`BNB Reward is: ${reward}`);
-  //             this.setState({ "reward": reward / (10 ** 18) }),// Math.round( * , 12) / 100000000 });
-  //                 console.log(this.state.reward);
-  //         });
-  //     SpaceMonkeyContract.getBalance()
-  //         .then(balance => {
-  //             // Todo: Handle BigInts
-  //             console.log(`The total balance is: ${balance}`);
-  //             this.setState({ "balance": Math.round(balance / (10 ** 9) * 1000, 6) / 1000 });//.toString()
-  //         });
-  //     SpaceMonkeyContract.nextAvailableClaimDate()
-  //         .then(date => {
-  //             this.setState({ "nextAvailableClaimDate": new Date(date * 1000) });
-  //         });
-  //     getTokenTransactionsForWallet(drizzleState.accounts[0])
-  //         .then(txns => {
-  //             this.setState({ "transactions": txns });
-  //         });
-  // }
-  //});
-  //   }
 
   return (
     <Dashboard
