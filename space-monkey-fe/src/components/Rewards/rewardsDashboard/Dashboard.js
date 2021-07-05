@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -10,22 +10,23 @@ import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
+import Badge from '@material-ui/core/Badge'; // deleteFile
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import NotificationsIcon from '@material-ui/icons/Notifications'; // deleteFile
 import { mainListItems } from './listItems';
 import PropTypes from 'prop-types';
-import ClaimReward from './ClaimReward';
+import ClaimReward from './ClaimReward'; // deleteFile
 import Rewards from './Rewards';
 import Transactions from './Transactions';
 import RfiReward from './RfiReward';
 import Balance from './Balance';
-import Navbar from './Navbar';
+import Navbar from './Navbar'; // deleteFile
+import WalletButton from './buttons/WalletButton';
 import Logo from '../../../assets/admonkey-logo.png';
 
 function Copyright() {
@@ -123,7 +124,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   fixedHeight: {
-    height: 240,
+    height: 300,
   },
 }));
 
@@ -140,44 +141,6 @@ const calculateReflectionReward = (balance, transactions) => {
   let result = balanceValue - investment;
   (result = (result / 10 ** 9) * 1000), 8 / 1000;
   return Math.round(result);
-};
-
-const Menu = () => {
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-
-  const handleDrawerClose = () => {
-    setOpen(!open);
-  };
-
-  return (
-    <Drawer
-      variant="permanent"
-      classes={{
-        paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-      }}
-      open={open}
-    >
-      <div className={classes.toolbarIcon}>
-        <IconButton onClick={handleDrawerClose}>
-          <ChevronLeftIcon />
-        </IconButton>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <img src={Logo} className={clsx(classes.logo)} />
-      </div>
-
-      <Divider />
-      <List>{mainListItems}</List>
-      <Divider />
-    </Drawer>
-  );
 };
 
 export default function Dashboard(props) {
@@ -198,30 +161,87 @@ export default function Dashboard(props) {
     loading,
   } = props;
 
-  console.log(props);
+  const [open, setOpen] = useState(true);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
   let rfiReward = 0;
 
   if (balance && transactions.length > 0) {
     rfiReward = calculateReflectionReward(balance, transactions);
   }
+/*
 
+this
+is
+not
+the
+fucking
+return
+you
+are
+lookinh
+for
+porcoddio
+foco
+ti
+odio
+sposta
+questo
+cazzo
+di
+component
+fuori
+di
+qui
+*/
   if (invalidChain || !initialized) {
     return (
       <div className={classes.root}>
         <CssBaseline />
-        <Navbar
+        {/* <Navbar
           loadWeb3Modal={loadWeb3Modal}
           logoutOfWeb3Modal={logoutOfWeb3Modal}
           provider={provider}
-        />
-        <Menu />
+        /> */}
+        <Drawer
+          variant="permanent"
+          classes={{
+            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
+          }}
+          open={open}
+        >
+          <div className={classes.toolbarIcon}>
+            <IconButton onClick={handleDrawerClose}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <img src={Logo} className={clsx(classes.logo)} />
+          </div>
+
+          <Divider />
+          <List>{mainListItems}</List>
+          <Divider />
+        </Drawer>
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           {!initialized ? (
             <h1>You must connect to a wallet</h1>
           ) : (
             <h1>You must be on chain {process.env.REACT_APP_CHAIN_ID}</h1>
-          )}
+        )}
         </main>
       </div>
     );
@@ -229,12 +249,62 @@ export default function Dashboard(props) {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Navbar
-        loadWeb3Modal={loadWeb3Modal}
-        logoutOfWeb3Modal={logoutOfWeb3Modal}
-        provider={provider}
-      />
-      <Menu />
+      <AppBar
+        position="absolute"
+        className={clsx(classes.appBar, open && classes.appBarShift)}
+      >
+        <Toolbar className={classes.toolbar}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            component="h1"
+            variant="h6"
+            color="inherit"
+            noWrap
+            className={classes.title}
+          >
+            Investor Dashboard
+          </Typography>
+          <WalletButton
+            provider={provider}
+            loadWeb3Modal={loadWeb3Modal}
+            logoutOfWeb3Modal={logoutOfWeb3Modal}
+          />
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        variant="permanent"
+        classes={{
+          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
+        }}
+        open={open}
+      >
+        <div className={classes.toolbarIcon}>
+          <IconButton onClick={handleDrawerClose}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <img src={Logo} className={clsx(classes.logo)} />
+        </div>
+
+        <Divider />
+        <List>{mainListItems}</List>
+        <Divider />
+      </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>

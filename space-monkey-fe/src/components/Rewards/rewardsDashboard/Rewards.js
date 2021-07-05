@@ -9,12 +9,15 @@ import Button from '@material-ui/core/Button';
 import Reward from '../images/reward/Reward';
 
 const useStyles = makeStyles({
-  depositContext: {
-    flex: 1,
+  button: {
+    marginTop: '1rem',
+  },
+  centered:{
     marginLeft: 'auto',
     marginRight: 'auto',
   },
-  centered:{
+  depositContext: {
+    flex: 1,
     marginLeft: 'auto',
     marginRight: 'auto',
   },
@@ -37,21 +40,21 @@ export default function Rewards(props) {
             </Grid>
           <Grid item xs={3} />
     </Grid>
-      <Typography component="p" variant="h5" className={classes.centered}>
+      {/* <Typography component="p" variant="h5" className={classes.centered}>
         {`${reward} BNB`}
       </Typography>
       <Typography color="textSecondary" className={classes.depositContext}>
         Next claim date {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'do MMM yyyy') : ''}
-      </Typography>
+      </Typography> */}
       <Button
         variant="contained"
+        className={classes.button}
         color="primary"
         size="large"
         disabled={disabled}
         onClick={() => { onClaimReward() }}
       >
-        {reward}
-        {/* {this.state.reward} */}
+        {`${reward} BNB`}
       </Button>
     </>
   );

@@ -111,13 +111,10 @@ function WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal }) {
   );
 }
 
-export default function Navbar(props) {
-  const { loadWeb3Modal, logoutOfWeb3Modal, provider } = props;
+export default function Navbar({ loadWeb3Modal, logoutOfWeb3Modal, provider}) {
 
   const classes = useStyles();
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+
   return (
     <AppBar
       position="absolute"
