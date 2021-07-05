@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import reward from './reward.png'
+import reward from './reward.jpeg'
 
 const useStyles = makeStyles({
   root: {

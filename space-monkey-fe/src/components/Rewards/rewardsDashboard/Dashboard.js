@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
@@ -26,32 +25,8 @@ import Rewards from './Rewards';
 import Transactions from './Transactions';
 import RfiReward from './RfiReward';
 import Balance from './Balance';
+import Navbar from './Navbar';
 import Logo from '../../../assets/admonkey-logo.png';
-=======
-import React from "react";
-import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Drawer from "@material-ui/core/Drawer";
-import Box from "@material-ui/core/Box";
-import Divider from "@material-ui/core/Divider";
-import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import Link from "@material-ui/core/Link";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import Navbar from "./Navbar";
-import { mainListItems } from "./ListItems";
-import PropTypes from "prop-types";
-import Rewards from "./Rewards";
-import Transactions from "./Transactions";
-import RfiReward from "./RfiReward";
-import Balance from "./Balance";
-import Logo from "../../../assets/admonkey-logo.png";
->>>>>>> 935e401e2833a2e0f1de21b2de2465133c8dadc2
 
 function Copyright() {
   return (

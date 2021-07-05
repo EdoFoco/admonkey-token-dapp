@@ -16,26 +16,26 @@ const useStyles = makeStyles({
       padding: '1 rem',
     },
     centered:{
-        marginLeft: 'auto',
-        marginRight: 'auto',
-      },
+      marginLeft: 'auto',
+      marginRight: 'auto',
+    },
   });
 
 export default function Balance({ balance }) {
     const classes = useStyles();
     return (
         <>
-              <div className={classes.centered}>
-                <Title>
-                  YOUR BALANCE
-                </Title>
-              </div>
-              <Grid container spacing={3}>
-                <Grid item xs={3} />
-                <Grid item xs={6}>
-                  <BalanceImg />
-                </Grid>
-              <Grid item xs={3} />
+        <div className={classes.centered}>
+          <Title>
+            YOUR BALANCE
+          </Title>
+        </div>
+        <Grid container spacing={3}>
+          <Grid item xs={3} />
+          <Grid item xs={6}>
+            <BalanceImg />
+          </Grid>
+        <Grid item xs={3} />
         </Grid>
           <Typography component="p" variant="h5" className={classes.centered}>
             {`${balance} BNB`}
