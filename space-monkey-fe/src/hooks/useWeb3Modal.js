@@ -38,6 +38,8 @@ function useWeb3Modal(config = {}) {
     },
   });
 
+  console.log(web3Modal);
+
   const setProviderEvents = (newProvider) => {
     newProvider.on("accountsChanged", (accounts) => {
       console.log(accounts);
@@ -54,8 +56,10 @@ function useWeb3Modal(config = {}) {
 
   const loadWeb3Modal = useCallback(async () => {
     const newProvider = await web3Modal.connect();
+    console.log(parseInt(newProvider.chainId));
     if (parseInt(newProvider.chainId) != process.env.REACT_APP_CHAIN_ID) {
       setInvalidChain(true);
+      return;
     }
 
     const web3Provider = new Web3Provider(newProvider);
@@ -80,6 +84,10 @@ function useWeb3Modal(config = {}) {
     if (autoLoad && !autoLoaded && web3Modal.cachedProvider) {
       loadWeb3Modal();
       setAutoLoaded(true);
+    }
+
+    if (!provider) {
+      web3Modal.clearCachedProvider();
     }
   }, [
     autoLoad,

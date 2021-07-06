@@ -55,10 +55,12 @@ export default function RewardsContainer() {
     }
   };
 
-  const onClaimReward = () => {
-    // SpaceMonkeyContract.claimReward().then((reward) => {
-    //   console.log("here is your fucking reward you dirty scammer: ", reward);
-    // });
+  const onClaimReward = async () => {
+    if (adMonkey) {
+      await adMonkey.claimBnbReward().catch((e) => {
+        console.log(e);
+      });
+    }
   };
 
   return (

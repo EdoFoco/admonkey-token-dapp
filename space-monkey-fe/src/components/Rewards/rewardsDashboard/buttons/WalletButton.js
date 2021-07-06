@@ -1,14 +1,20 @@
-import React from 'react';
+import React from "react";
 import Button from "@material-ui/core/Button";
 
-export default function WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal }) {
+export default function WalletButton({
+  provider,
+  loadWeb3Modal,
+  logoutOfWeb3Modal,
+}) {
   return (
     <Button
       variant="primary"
       className="ml-1"
       onClick={() => {
         if (!provider) {
-          loadWeb3Modal();
+          loadWeb3Modal().catch((e) => {
+            console.log(e);
+          });
         } else {
           logoutOfWeb3Modal();
         }
