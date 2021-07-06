@@ -20,7 +20,7 @@ export default function WalletButton({
         }
       }}
     >
-      {!provider ? "Connect Wallet" : "Disconnect Wallet"}
+      {!provider ? "Connect" : "Disconnect"}
     </Button>
   );
 }
