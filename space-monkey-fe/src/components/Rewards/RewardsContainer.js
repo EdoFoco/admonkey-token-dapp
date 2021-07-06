@@ -29,7 +29,7 @@ export default function RewardsContainer() {
   });
 
   const isClaimButtonDisabled = () => {
-    if (null != reward && parseFloat(reward, 10) === 0 && true === true) {
+    if (null != reward && parseFloat(reward, 10) !== 0) {
       return false;
     }
     return true;

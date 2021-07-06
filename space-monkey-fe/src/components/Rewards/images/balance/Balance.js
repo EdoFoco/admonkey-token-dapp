@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import balance from './balance.jpeg'
+import balance from './balance.png'
 
 const useStyles = makeStyles({
   root: {
