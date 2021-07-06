@@ -9,6 +9,11 @@ export default function WalletButton({
   return (
     <Button
       variant="primary"
+      style={{
+        backgroundColor: "#e67e22",
+        color: "white",
+        borderRadius: "20px",
+      }}
       className="ml-1"
       onClick={() => {
         if (!provider) {

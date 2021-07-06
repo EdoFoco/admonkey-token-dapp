@@ -24,14 +24,15 @@ function useWeb3Modal(config = {}) {
           rpc: rpcOptions,
         },
         display: {
-          name: "Wallet connect",
-          description: "Connect with Wallet Connect",
+          name: "Mobile",
+          description:
+            "Connect with mobile apps compatible with Wallet Connect",
         },
       },
       injected: {
         display: {
-          name: "Injected",
-          description: "Connect with the provider in your Browser",
+          name: "Web",
+          description: "Connect with the most common web extensions",
         },
         package: null,
       },

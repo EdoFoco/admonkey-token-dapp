@@ -27,7 +27,7 @@ import RfiReward from "./RfiReward";
 import Balance from "./Balance";
 import Navbar from "./Navbar"; // deleteFile
 import WalletButton from "./buttons/WalletButton";
-import Logo from "../../../assets/admonkey-logo.png";
+import Logo from "../../../assets/admonkey-logo-no-text.png";
 
 function Copyright() {
   return (
@@ -60,32 +60,36 @@ const useStyles = makeStyles((theme) => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    background: "linear-gradient(45deg, #000080 20%, #4682b4 90%)",
+    backgroundColor: "white",
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
   logo: {
-    maxWidth: "150px",
+    maxWidth: "50px",
     width: "100%",
+    marginRight: "10px",
   },
   appBarShift: {
     marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
+    width: "100%",
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
   menuButton: {
-    marginRight: 36,
+    marginRight: 10,
+    color: "black",
+    display: "flex !important",
   },
   menuButtonHidden: {
     display: "none",
   },
   title: {
     flexGrow: 1,
+    color: "black",
   },
   drawerPaper: {
     position: "relative",
@@ -164,7 +168,7 @@ export default function Dashboard(props) {
   const [open, setOpen] = useState(true);
 
   const handleDrawerOpen = () => {
-    setOpen(true);
+    setOpen(!open);
   };
   const handleDrawerClose = () => {
     setOpen(false);
@@ -197,6 +201,8 @@ export default function Dashboard(props) {
             >
               <MenuIcon />
             </IconButton>
+
+            <img src={Logo} className={clsx(classes.logo)} />
             <Typography
               component="h1"
               variant="h6"
@@ -204,7 +210,7 @@ export default function Dashboard(props) {
               noWrap
               className={classes.title}
             >
-              Investor Dashboard
+              <b style={{ color: "#e67e22" }}>Ad</b>Monkey
             </Typography>
             <WalletButton
               provider={provider}
@@ -224,15 +230,6 @@ export default function Dashboard(props) {
             <IconButton onClick={handleDrawerClose}>
               <ChevronLeftIcon />
             </IconButton>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <img src={Logo} className={clsx(classes.logo)} />
           </div>
 
           <Divider />
@@ -270,6 +267,7 @@ export default function Dashboard(props) {
           >
             <MenuIcon />
           </IconButton>
+          <img src={Logo} className={clsx(classes.logo)} />
           <Typography
             component="h1"
             variant="h6"
@@ -277,7 +275,7 @@ export default function Dashboard(props) {
             noWrap
             className={classes.title}
           >
-            Investor Dashboard
+            <b style={{ color: "#e67e22" }}>Ad</b>Monkey
           </Typography>
           <WalletButton
             provider={provider}
@@ -297,15 +295,6 @@ export default function Dashboard(props) {
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <img src={Logo} className={clsx(classes.logo)} />
         </div>
 
         <Divider />
