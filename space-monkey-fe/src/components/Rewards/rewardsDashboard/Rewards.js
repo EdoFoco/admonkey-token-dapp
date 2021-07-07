@@ -54,7 +54,7 @@ export default function Rewards(props) {
         disabled={disabled}
         onClick={() => { onClaimReward() }}
       >
-        {`${reward} BNB`}
+        {`${reward ? reward : ''} BNB`}
       </Button>
     </>
   );

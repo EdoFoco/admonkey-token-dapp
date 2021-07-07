@@ -18,7 +18,7 @@ import Link from "@material-ui/core/Link";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications"; // deleteFile
-import { mainListItems } from "./ListItems";
+import { mainListItems } from "./listItems";
 import PropTypes from "prop-types";
 import ClaimReward from "./ClaimReward"; // deleteFile
 import Rewards from "./Rewards";
@@ -210,7 +210,7 @@ export default function Dashboard(props) {
               noWrap
               className={classes.title}
             >
-              <b style={{ color: "#e67e22" }}>Ad</b>Monkey
+              <b>Ad</b>Monkey
             </Typography>
             <WalletButton
               provider={provider}

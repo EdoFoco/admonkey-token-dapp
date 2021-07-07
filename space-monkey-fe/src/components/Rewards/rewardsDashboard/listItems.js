@@ -10,6 +10,14 @@ import HistoryIcon from '@material-ui/icons/History';
 import EqualizerIcon from '@material-ui/icons/Equalizer';
 import InfoIcon from '@material-ui/icons/Info';
 
+function UnstyledAnchor({children, url }) {
+  return (
+    <div onClick={() => { window.open(url, "_blank")}}>
+      {children}
+    </div>
+  );
+}
+
 export const mainListItems = (
   <div>
     <ListItem button>
@@ -18,36 +26,36 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
     </ListItem>
-    <a href="https://pancakeswap.com/" target="_blank">
+    <UnstyledAnchor url="https://pancakeswap.com/">
       <ListItem button>
         <ListItemIcon>
           <AddShoppingCartIcon />
         </ListItemIcon>
         <ListItemText primary="Buy" />
       </ListItem>
-    </a>
+    </UnstyledAnchor>
     <ListItem button>
       <ListItemIcon>
         <HistoryIcon />
       </ListItemIcon>
-      <ListItemText primary="Orders" />
+      <ListItemText primary="Orders - TBC" />
     </ListItem>
-    <a href="https://poocoin.com/" target="_blank">
+    <UnstyledAnchor url="https://poocoin.com/">
       <ListItem button>
         <ListItemIcon>
           <EqualizerIcon />
         </ListItemIcon>
         <ListItemText primary="Charts" />
       </ListItem>
-    </a>
-    <a href="https://bscscan.com/token/0xC66e4F27D927B137D6245fc8647Eef887a127924" target="_blank">
+    </UnstyledAnchor>
+    <UnstyledAnchor url="https://bscscan.com/token/0xC66e4F27D927B137D6245fc8647Eef887a127924/">
       <ListItem button>
         <ListItemIcon>
           <InfoIcon />
         </ListItemIcon>
         <ListItemText primary="Contract Details" />
       </ListItem>
-    </a>
+    </UnstyledAnchor>
   </div>
 );
 
