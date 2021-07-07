@@ -107,6 +107,12 @@ body {
   padding: 20px;
 }
 
-/* .MuiTypography-colorPrimary{
-  color:rgb(184,89,52) !important;
-} */
+/* Material-UI */
+.MuiTypography-colorPrimary{
+  color:rgb(230, 126, 34) !important;
+}
+
+.MuiButton-containedPrimary	{
+  background-color:rgb(230, 126, 34) !important;
+}
+/* End Material-UI */

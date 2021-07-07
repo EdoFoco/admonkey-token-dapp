@@ -32,7 +32,7 @@ export default function RfiReward(props) {
           </Grid>
         <Grid item xs={3} />
         </Grid>
-        <Typography component="p" variant="h4" className={classes.centered}>
+        <Typography component="p" variant="h5" className={classes.centered}>
             {rfiReward}
         </Typography>
         <Typography color="textSecondary" className={classes.centered}>
