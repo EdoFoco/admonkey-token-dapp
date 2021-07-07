@@ -5,20 +5,28 @@ import Button from "@material-ui/core/Button";
 import Reward from "../images/reward/Reward";
 import Title from "./Title";
 import PropTypes from "prop-types";
+import Logo from "../../../assets/admonkey-logo-no-text.png";
 
 const useStyles = makeStyles({
   root: {
     display: "flex",
-    justifyContent: "center",
+    alignItems: "center",
+    justifyItems: "center",
   },
   messageContainer: {
     width: "90%",
-    backgroundColor: "black",
     display: "flex",
     justifyContent: "center",
+    flexDirection: "column",
+    justifyItems: "center",
+    margin: "40px",
   },
   titleContainer: {
     justifyContent: "center",
+    color: "black",
+  },
+  logo: {
+    width: "15%",
   },
 });
 
@@ -28,14 +36,15 @@ export default function ConnectToWallet({ reward, onClaimReward, disabled }) {
   return (
     <div className={classes.root}>
       <div className={classes.messageContainer}>
+        <img src={Logo} className={classes.logo} />
+
         <div className={classes.titleContainer}>
-          <Title>Welcome to</Title>
-          <Title>
-            <b style={{ color: "#e67e22" }}>Ad</b>Monkey
-          </Title>
+          <h1>
+            Welcome to <b style={{ color: "#e67e22" }}>Ad</b>Monkey
+          </h1>
         </div>
         <div>
-          <Button
+          {/* <Button
             variant="contained"
             className={classes.root}
             color="primary"
@@ -46,7 +55,7 @@ export default function ConnectToWallet({ reward, onClaimReward, disabled }) {
             }}
           >
             {`${reward} BNB`}
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>
