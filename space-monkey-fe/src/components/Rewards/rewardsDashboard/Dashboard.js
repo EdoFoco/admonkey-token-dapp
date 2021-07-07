@@ -10,7 +10,6 @@ import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
-import Badge from "@material-ui/core/Badge"; // deleteFile
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
@@ -20,14 +19,14 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications"; // deleteFile
 import { mainListItems } from "./listItems";
 import PropTypes from "prop-types";
-import ClaimReward from "./ClaimReward"; // deleteFile
 import Rewards from "./Rewards";
 import Transactions from "./Transactions";
 import RfiReward from "./RfiReward";
 import Balance from "./Balance";
-import Navbar from "./Navbar"; // deleteFile
 import WalletButton from "./buttons/WalletButton";
 import Logo from "../../../assets/admonkey-logo-no-text.png";
+import RfiRewardImg from "../images/reward/reward.png";
+import ConnectToWallet from "./ConnectToWallet";
 
 function Copyright() {
   return (
@@ -147,6 +146,62 @@ const calculateReflectionReward = (balance, transactions) => {
   return Math.round(result);
 };
 
+const RenderTopSection = ({
+  balance,
+  reward,
+  nextAvailableClaimDate,
+  onClaimReward,
+}) => {
+  return (
+    <div
+      style={{
+        backgroundColor: "#2c3e50",
+        padding: "40px",
+        display: "flex",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "60%",
+        }}
+      >
+        <div
+          style={{
+            color: "#e67e22",
+            fontSize: "1.25rem",
+            fontWeight: "bold",
+          }}
+        >
+          Invest in AdMonkey
+        </div>
+        <div style={{ color: "white", fontSize: "1.75rem", marginTop: "20px" }}>
+          Earn <b>BNB</b> and <b>$ADMONKEY</b> just by holding
+        </div>
+        <div style={{ marginTop: "40px" }}>
+          <a
+            style={{
+              backgroundColor: "#e67e22",
+              color: "white",
+              borderRadius: "20px",
+              padding: "10px",
+              textTransform: "uppercase",
+              fontWeight: "bold",
+            }}
+            href={`https://pancakeswap.finance/#/swap?outputCurrency=${process.env.REACT_APP_CONTRACT_ADDRESS}`}
+          >
+            Buy $ADMONKEY
+          </a>
+        </div>
+      </div>
+      <div style={{ display: "flex", width: "40%" }}>
+        <img src={RfiRewardImg} style={{ width: "150px", margin: "auto" }} />
+      </div>
+    </div>
+  );
+};
+
 export default function Dashboard(props) {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
@@ -239,7 +294,7 @@ export default function Dashboard(props) {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           {!initialized ? (
-            <h1>You must connect to a wallet</h1>
+            <ConnectToWallet />
           ) : (
             <h1>You must be on chain {process.env.REACT_APP_CHAIN_ID}</h1>
           )}
@@ -303,6 +358,7 @@ export default function Dashboard(props) {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
+        <RenderTopSection balance={balance} reward={reward} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={3} lg={4}>

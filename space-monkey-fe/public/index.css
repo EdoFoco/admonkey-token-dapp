@@ -12,6 +12,14 @@ body {
   background-size: cover;
 }
 
+.MuiTypography-colorPrimary {
+  color: #e67e22 !important;
+}
+
+.MuiButton-containedPrimary {
+  background-color: #e67e22 !important;
+}
+
 #root {
   height: 100%;
   display: flex;
