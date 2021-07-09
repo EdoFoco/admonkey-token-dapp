@@ -4,7 +4,6 @@ import Web3 from "web3";
 export default class AdMonkey {
   constructor(provider, account) {
     this.provider = new Web3(provider);
-    console.log(this.provider);
     this.account = account;
     this.contract = new this.provider.eth.Contract(
       AdMonkeyAbi.abi,

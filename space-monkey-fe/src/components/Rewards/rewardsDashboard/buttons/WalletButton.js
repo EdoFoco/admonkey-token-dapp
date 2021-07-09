@@ -8,7 +8,6 @@ export default function WalletButton({
 }) {
   return (
     <Button
-      variant="primary"
       style={{
         backgroundColor: "#e67e22",
         color: "white",
@@ -17,9 +16,7 @@ export default function WalletButton({
       className="ml-1"
       onClick={() => {
         if (!provider) {
-          loadWeb3Modal().catch((e) => {
-            console.log(e);
-          });
+          loadWeb3Modal();
         } else {
           logoutOfWeb3Modal();
         }

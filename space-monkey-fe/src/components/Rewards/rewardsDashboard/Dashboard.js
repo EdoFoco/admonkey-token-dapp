@@ -27,6 +27,7 @@ import Balance from "./Balance";
 import WalletButton from "./buttons/WalletButton";
 import Logo from "../../../assets/admonkey-logo-no-text.png";
 import ConnectToWallet from "./ConnectToWallet";
+import { BigNumber } from "ethers";
 
 function Copyright() {
   return (
@@ -142,8 +143,8 @@ const calculateReflectionReward = (balance, transactions) => {
   }
 
   let result = balanceValue - investment;
-  (result = (result / 10 ** 9) * 1000), 8 / 1000;
-  return Math.round(result);
+  result = result / 10 ** 9;
+  return result;
 };
 
 // const RenderTopSection = ({
@@ -265,7 +266,7 @@ export default function Dashboard(props) {
               noWrap
               className={classes.title}
             >
-              <b>Ad</b>Monkey
+              <b style={{ color: "#e67e22" }}>Ad</b>Monkey
             </Typography>
             <WalletButton
               provider={provider}
@@ -294,11 +295,7 @@ export default function Dashboard(props) {
         </Drawer>
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-          {!initialized ? (
-            <ConnectToWallet />
-          ) : (
-            <h1>You must be on chain {process.env.REACT_APP_CHAIN_ID}</h1>
-          )}
+          <ConnectToWallet isInvalidChain={invalidChain} />
         </main>
       </div>
     );
@@ -403,9 +400,8 @@ export default function Dashboard(props) {
 }
 
 Dashboard.propTypes = {
-  reward: PropTypes.string,
+  reward: PropTypes.number,
   nextAvailableClaimDate: PropTypes.instanceOf(Date),
-  balance: PropTypes.string,
-  drizzleContext: PropTypes.object,
+  balance: PropTypes.number,
   transactions: PropTypes.array,
 };

@@ -39,11 +39,9 @@ function useWeb3Modal(config = {}) {
     },
   });
 
-  console.log(web3Modal);
-
   const setProviderEvents = (newProvider) => {
     newProvider.on("accountsChanged", (accounts) => {
-      console.log(accounts);
+      //console.log(accounts);
     });
 
     newProvider.on("chainChanged", (chainId) => {
@@ -57,14 +55,12 @@ function useWeb3Modal(config = {}) {
 
   const loadWeb3Modal = useCallback(async () => {
     const newProvider = await web3Modal.connect();
-    console.log(parseInt(newProvider.chainId));
     if (parseInt(newProvider.chainId) != process.env.REACT_APP_CHAIN_ID) {
       setInvalidChain(true);
       return;
     }
 
     const web3Provider = new Web3Provider(newProvider);
-    console.log(web3Provider);
 
     setProvider(web3Provider);
     setSignedInAddress(newProvider.selectedAddress);
