@@ -9,6 +9,9 @@ import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import HistoryIcon from '@material-ui/icons/History';
 import EqualizerIcon from '@material-ui/icons/Equalizer';
 import InfoIcon from '@material-ui/icons/Info';
+import TelegramIcon from '@material-ui/icons/Telegram';
+import TwitterIcon from '@material-ui/icons/Twitter';
+import FacebookIcon from '@material-ui/icons/Facebook';
 
 function UnstyledAnchor({children, url }) {
   return (
@@ -34,12 +37,12 @@ export const mainListItems = (
         <ListItemText primary="Buy" />
       </ListItem>
     </UnstyledAnchor>
-    <ListItem button>
+    {/* <ListItem button>
       <ListItemIcon>
         <HistoryIcon />
       </ListItemIcon>
       <ListItemText primary="Orders - TBC" />
-    </ListItem>
+    </ListItem> */}
     <UnstyledAnchor url="https://poocoin.com/">
       <ListItem button>
         <ListItemIcon>
@@ -61,24 +64,30 @@ export const mainListItems = (
 
 export const secondaryListItems = (
   <div>
-    <ListSubheader inset>Saved reports</ListSubheader>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Current month" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last quarter" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Year-end sale" />
-    </ListItem>
+    <ListSubheader inset>Social Media</ListSubheader>
+    <UnstyledAnchor url="https://pancakeswap.com/">
+      <ListItem button>
+        <ListItemIcon>
+          <TelegramIcon />
+        </ListItemIcon>
+        <ListItemText primary="Buy" />
+      </ListItem>
+    </UnstyledAnchor>
+    <UnstyledAnchor url="https://pancakeswap.com/">
+      <ListItem button>
+        <ListItemIcon>
+          <TwitterIcon />
+        </ListItemIcon>
+        <ListItemText primary="Buy" />
+      </ListItem>
+    </UnstyledAnchor>
+    <UnstyledAnchor url="https://pancakeswap.com/">
+      <ListItem button>
+        <ListItemIcon>
+          <FacebookIcon />
+        </ListItemIcon>
+        <ListItemText primary="Buy" />
+      </ListItem>
+    </UnstyledAnchor>
   </div>
 );
