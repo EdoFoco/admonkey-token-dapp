@@ -46,7 +46,7 @@ export default function ConnectToWallet({ isInvalidChain }) {
           </h1>
         </div>
         <div style={{ fontSize: "1.75rem", color: "#e67e22" }}>
-          {isInvalidChain ? "Are you on BSC" : null}
+          {isInvalidChain ? "Are you on BSC?" : null}
         </div>
         <div>
           <div style={{ fontSize: "1.75rem", color: "white" }}>
