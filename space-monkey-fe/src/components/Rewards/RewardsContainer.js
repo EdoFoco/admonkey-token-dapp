@@ -46,7 +46,7 @@ export default function RewardsContainer() {
         await adMonkeyContract.nextAvailableClaimDate();
 
       const transactions = await getTokenTransactionsForWallet(account);
-      console.log(bnbReward);
+      console.log(new Date(nextAvailableClaimDate * 1000));
 
       setBnbReward(bnbReward / 10 ** 18); // Math.round( * , 12) / 100000000 });
       setBalance(Math.round((balance / 10 ** 9) * 1000, 6) / 1000);
@@ -58,7 +58,7 @@ export default function RewardsContainer() {
 
   const onClaimReward = async () => {
     if (adMonkey) {
-      await adMonkey.claimBnbReward().catch((e) => {
+      adMonkey.claimBnbReward().catch((e) => {
         console.log(e);
       });
     }
