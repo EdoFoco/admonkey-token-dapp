@@ -41,12 +41,6 @@ export const mainListItems = (
         <ListItemText primary="Buy" />
       </ListItem>
     </UnstyledAnchor>
-    {/* <ListItem button>
-      <ListItemIcon>
-        <HistoryIcon />
-      </ListItemIcon>
-      <ListItemText primary="Orders - TBC" />
-    </ListItem> */}
     <UnstyledAnchor url="https://poocoin.com/">
       <ListItem button>
         <ListItemIcon>
@@ -69,28 +63,28 @@ export const mainListItems = (
 export const secondaryListItems = (
   <div>
     <ListSubheader inset>Social Media</ListSubheader>
-    <UnstyledAnchor url="https://pancakeswap.com/">
+    <UnstyledAnchor url="https://t.me/admonkeytoken">
       <ListItem button>
         <ListItemIcon>
           <TelegramIcon />
         </ListItemIcon>
-        <ListItemText primary="Buy" />
+        <ListItemText primary="Telegram" />
       </ListItem>
     </UnstyledAnchor>
-    <UnstyledAnchor url="https://pancakeswap.com/">
+    <UnstyledAnchor url="https://twitter.com/AdMonkeyToken">
       <ListItem button>
         <ListItemIcon>
           <TwitterIcon />
         </ListItemIcon>
-        <ListItemText primary="Buy" />
+        <ListItemText primary="Twitter" />
       </ListItem>
     </UnstyledAnchor>
-    <UnstyledAnchor url="https://pancakeswap.com/">
+    <UnstyledAnchor url="https://www.facebook.com/AdMonkeyNetwork">
       <ListItem button>
         <ListItemIcon>
           <FacebookIcon />
         </ListItemIcon>
-        <ListItemText primary="Buy" />
+        <ListItemText primary="Facebook" />
       </ListItem>
     </UnstyledAnchor>
   </div>

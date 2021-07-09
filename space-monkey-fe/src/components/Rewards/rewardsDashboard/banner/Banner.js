@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import RfiRewardImg from "../../images/reward/Reward";
+import Reward from "../../images/reward/reward.png";
 
 const useStyles = makeStyles({
   div1: {
@@ -69,7 +69,7 @@ export default function Banner({
         </div>
       </div>
       <div className={classes.div5}>
-        <img src={RfiRewardImg} style={{ width: "150px", margin: "auto" }} />
+        <img alt="Rfi Reward" src={Reward} style={{ width: "150px", margin: "auto" }} />
       </div>
     </div>
   );
