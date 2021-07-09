@@ -23,7 +23,9 @@ export default class AdMonkey {
 
   async claimBnbReward() {
     if (!this.provider) return;
-    return await this.contract.methods.claimBNBReward().call();
+    return await this.contract.methods
+      .claimBNBReward()
+      .send({ from: this.account });
   }
 
   async nextAvailableClaimDate() {

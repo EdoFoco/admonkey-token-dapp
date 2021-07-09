@@ -1,6 +1,6 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Reward from "../../images/reward/reward.png";
 
 const useStyles = makeStyles({
@@ -20,10 +20,11 @@ const useStyles = makeStyles({
     fontWeight: "bold",
   },
   div4: {
-    marginTop: "40px"
+    marginTop: "40px",
   },
   div5: {
-    display: "flex", width: "40%"
+    display: "flex",
+    width: "40%",
   },
   anchor: {
     backgroundColor: "#e67e22",
@@ -31,7 +32,7 @@ const useStyles = makeStyles({
     borderRadius: "20px",
     padding: "10px",
     textTransform: "uppercase",
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
 });
 
@@ -42,34 +43,29 @@ export default function Banner({
   onClaimReward,
 }) {
   const classes = useStyles();
-  const matches = useMediaQuery('(min-width: 600px)');
+  const matches = useMediaQuery("(min-width: 600px)");
   return (
-    <div
-      style={matches ? {} : {display: 'none'} }
-      className={classes.div1}
-    >
-      <div
-        className={classes.div2}
-      >
-        <div
-          className={classes.div3}
-        >
-          Invest in AdMonkey
-        </div>
+    <div style={matches ? {} : { display: "none" }} className={classes.div1}>
+      <div className={classes.div2}>
+        <div className={classes.div3}>Invest in AdMonkey</div>
         <div style={{ color: "white", fontSize: "1.75rem", marginTop: "20px" }}>
-          Earn <b>BNB</b> and <b>$ADMONKEY</b> just by holding
+          Earn <b>BNB</b> and <b>ADMONKEY</b> just by holding
         </div>
         <div className={classes.div4}>
           <a
             className={classes.anchor}
             href={`https://pancakeswap.finance/#/swap?outputCurrency=${process.env.REACT_APP_CONTRACT_ADDRESS}`}
           >
-            Buy $ADMONKEY
+            Buy ADMONKEY
           </a>
         </div>
       </div>
       <div className={classes.div5}>
-        <img alt="Rfi Reward" src={Reward} style={{ width: "150px", margin: "auto" }} />
+        {/* {/* <img
+          alt="Rfi Reward"
+          src={Reward}
+          style={{ width: "150px", margin: "auto" }}
+        /> */}
       </div>
     </div>
   );

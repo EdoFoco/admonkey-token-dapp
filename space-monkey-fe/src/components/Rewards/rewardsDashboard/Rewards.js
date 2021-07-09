@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import { format } from "date-fns";
 import Button from "@material-ui/core/Button";
 import Reward from "../images/reward/Reward";
+import { BigNumber } from "ethers";
 
 const useStyles = makeStyles({
   button: {
@@ -20,12 +21,17 @@ const useStyles = makeStyles({
     flex: 1,
     marginLeft: "auto",
     marginRight: "auto",
+    fontSize: "1em",
   },
 });
 
 export default function Rewards(props) {
   const { reward, nextAvailableClaimDate, disabled, onClaimReward } = props;
   const classes = useStyles();
+
+  console.log(nextAvailableClaimDate);
+  //const formattedReward = reward ? BigNumber.from(reward) : null;
+
   return (
     <>
       <div className={classes.centered}>
@@ -38,12 +44,6 @@ export default function Rewards(props) {
         </Grid>
         <Grid item xs={3} />
       </Grid>
-      {/* <Typography component="p" variant="h5" className={classes.centered}>
-        {`${reward} BNB`}
-      </Typography>
-      <Typography color="textSecondary" className={classes.depositContext}>
-        Next claim date {nextAvailableClaimDate ? format(nextAvailableClaimDate, 'do MMM yyyy') : ''}
-      </Typography> */}
       <Button
         variant="contained"
         className={classes.button}
@@ -54,8 +54,14 @@ export default function Rewards(props) {
           onClaimReward();
         }}
       >
-        {`${reward ? reward : ""} BNB`}
+        {`${reward ? reward.toFixed(18) : ""} BNB`}
       </Button>
+      <Typography color="textSecondary" className={classes.depositContext}>
+        Claimable from:{" "}
+        {nextAvailableClaimDate
+          ? format(nextAvailableClaimDate, "do MMM yyyy HH:mm")
+          : ""}
+      </Typography>
     </>
   );
 }
