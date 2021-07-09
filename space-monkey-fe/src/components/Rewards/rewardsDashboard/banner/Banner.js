@@ -68,9 +68,6 @@ export default function Banner({
           </a>
         </div>
       </div>
-      <div className={classes.div5}>
-        <img alt="Rfi Reward" src={Reward} style={{ width: "150px", margin: "auto" }} />
-      </div>
     </div>
   );
 }
