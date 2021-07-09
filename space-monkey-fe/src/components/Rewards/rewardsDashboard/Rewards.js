@@ -29,8 +29,8 @@ export default function Rewards(props) {
   const { reward, nextAvailableClaimDate, disabled, onClaimReward } = props;
   const classes = useStyles();
 
-  console.log(nextAvailableClaimDate);
-  //const formattedReward = reward ? BigNumber.from(reward) : null;
+  const rewardDisabled =
+    !nextAvailableClaimDate || nextAvailableClaimDate >= Date.now();
 
   return (
     <>
@@ -49,18 +49,19 @@ export default function Rewards(props) {
         className={classes.button}
         color="primary"
         size="large"
-        disabled={disabled}
+        disabled={rewardDisabled}
         onClick={() => {
           onClaimReward();
         }}
       >
         {`${reward ? reward.toFixed(18) : ""} BNB`}
       </Button>
+
       <Typography color="textSecondary" className={classes.depositContext}>
-        Claimable from:{" "}
         {nextAvailableClaimDate
-          ? format(nextAvailableClaimDate, "do MMM yyyy HH:mm")
-          : ""}
+          ? "Claimable from: " +
+            format(nextAvailableClaimDate, "do MMM yyyy HH:mm:ss")
+          : "Buy ADMONKEY to earn rewards"}
       </Typography>
     </>
   );
