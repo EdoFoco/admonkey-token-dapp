@@ -54,16 +54,16 @@ export default function Rewards(props) {
           onClaimReward();
         }}
       >
-        {`${reward ? reward : ''} BNB`}
+        {`${reward ? reward : ""} BNB`}
       </Button>
     </>
   );
 }
 
 Rewards.propTypes = {
-  rewards: PropTypes.string,
+  rewards: PropTypes.number,
   nextAvailableClaimDate: PropTypes.instanceOf(Date),
-  balance: PropTypes.string,
+  balance: PropTypes.number,
   onClaimReward: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
 };

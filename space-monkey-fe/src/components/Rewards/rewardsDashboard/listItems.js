@@ -1,18 +1,22 @@
-import React from 'react';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import AssignmentIcon from '@material-ui/icons/Assignment';
-import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
-import HistoryIcon from '@material-ui/icons/History';
-import EqualizerIcon from '@material-ui/icons/Equalizer';
-import InfoIcon from '@material-ui/icons/Info';
+import React from "react";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import AssignmentIcon from "@material-ui/icons/Assignment";
+import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart";
+import HistoryIcon from "@material-ui/icons/History";
+import EqualizerIcon from "@material-ui/icons/Equalizer";
+import InfoIcon from "@material-ui/icons/Info";
 
-function UnstyledAnchor({children, url }) {
+function UnstyledAnchor({ children, url }) {
   return (
-    <div onClick={() => { window.open(url, "_blank")}}>
+    <div
+      onClick={() => {
+        window.open(url, "_blank");
+      }}
+    >
       {children}
     </div>
   );
@@ -38,7 +42,7 @@ export const mainListItems = (
       <ListItemIcon>
         <HistoryIcon />
       </ListItemIcon>
-      <ListItemText primary="Orders - TBC" />
+      <ListItemText primary="Transactions" />
     </ListItem>
     <UnstyledAnchor url="https://poocoin.com/">
       <ListItem button>

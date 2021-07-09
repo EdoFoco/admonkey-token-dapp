@@ -26,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Transactions(props) {
-  console.log(props);
   const classes = useStyles();
   const transactions = props.transactions ? props.transactions : [];
   return (
@@ -43,19 +42,28 @@ export default function Transactions(props) {
         </TableHead>
         <TableBody>
           {transactions.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow key={row.hash}>
               <TableCell>
                 <a
                   href={`${process.env.REACT_APP_BSCSCAN_BASE_URL}/tx/${row.hash}`}
                 >
-                  {row.hash}
+                  <div
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      width: "200px",
+                    }}
+                  >
+                    {row.hash}
+                  </div>
                 </a>
               </TableCell>
-              <TableCell align="right">
-                {Math.round(row.value * 1000, 6) / 1000}
+              <TableCell align="left">
+                {Math.round((row.value / 10 ** 9) * 1000, 6) / 1000}
               </TableCell>
-              <TableCell align="right">{row.direction}</TableCell>
-              <TableCell align="right">
+              <TableCell align="left">{row.direction}</TableCell>
+              <TableCell align="left">
                 {format(row.timeStamp * 1000, "do MMM yyyy")}
               </TableCell>
             </TableRow>
