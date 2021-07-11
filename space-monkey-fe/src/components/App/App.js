@@ -23,20 +23,7 @@ class App extends Component {
   }
 
   render() {
-    // const { drizzleState, initialized } = this.props.drizzleContext;
-
-    //console.log(drizzleState);
-    // if (!window.ethereum)
-    //   return (<MainLayout><Web3ErrorModal /></MainLayout>);
-
-    // if (!initialized)
-    //   return <div>Loading...</div>
-
-    // if (drizzleState.web3.networkId != process.env.REACT_APP_CHAIN_ID)
-    //   return (<MainLayout><Web3ErrorModal /></MainLayout>);
-
     return (
-      //<div>Hello</div>
       <AppContext.Provider value={this.state.appContext}>
         <Routes />
       </AppContext.Provider>
@@ -44,10 +31,4 @@ class App extends Component {
   }
 }
 
-// React compose pattern FTW.
-// const enhance = _.flowRight([
-//   withDrizzleContextProvider,
-//   withDrizzleContextConsumer
-// ]);
-
-export default App; //.enhance(App);
+export default App;

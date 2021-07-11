@@ -42,14 +42,19 @@ export default function RewardsContainer() {
 
       const balance = await adMonkeyContract.getBalance();
       const bnbReward = await adMonkeyContract.calculateBNBReward();
-      const nextAvailableClaimDate =
+      let nextAvailableClaimDate =
         await adMonkeyContract.nextAvailableClaimDate();
+
+      nextAvailableClaimDate =
+        nextAvailableClaimDate && nextAvailableClaimDate > 0
+          ? new Date(nextAvailableClaimDate * 1000)
+          : null;
 
       const transactions = await getTokenTransactionsForWallet(account);
 
-      setBnbReward(bnbReward / 10 ** 18); // Math.round( * , 12) / 100000000 });
+      setBnbReward(bnbReward / 10 ** 18);
       setBalance(Math.round((balance / 10 ** 9) * 1000, 6) / 1000);
-      setNextAvailableClaimDate(new Date(nextAvailableClaimDate * 1000));
+      setNextAvailableClaimDate(nextAvailableClaimDate);
       setTransactions(transactions);
       setLoading(false);
     }

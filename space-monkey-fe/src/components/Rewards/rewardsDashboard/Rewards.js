@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import Button from "@material-ui/core/Button";
 import Reward from "../images/reward/Reward";
 import { BigNumber } from "ethers";
+import { isObject } from "lodash";
 
 const useStyles = makeStyles({
   button: {

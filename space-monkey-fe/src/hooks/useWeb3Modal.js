@@ -62,10 +62,15 @@ function useWeb3Modal(config = {}) {
 
     const web3Provider = new Web3Provider(newProvider);
 
+    let selectedAddress = newProvider.selectedAddress;
+    if (!selectedAddress) {
+      selectedAddress = newProvider.accounts[0];
+    }
+
     setProvider(web3Provider);
-    setSignedInAddress(newProvider.selectedAddress);
+    setSignedInAddress(selectedAddress);
     setProviderEvents(newProvider);
-    onLoad(web3Provider, newProvider.selectedAddress);
+    onLoad(web3Provider, selectedAddress);
   }, [web3Modal]);
 
   const logoutOfWeb3Modal = useCallback(
