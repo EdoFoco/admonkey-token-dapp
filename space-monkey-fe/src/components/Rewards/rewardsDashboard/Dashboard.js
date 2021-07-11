@@ -165,7 +165,7 @@ export default function Dashboard(props) {
     loading,
   } = props;
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(!open);

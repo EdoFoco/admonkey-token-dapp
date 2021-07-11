@@ -54,7 +54,8 @@ export default function Banner({
         <div className={classes.div4}>
           <a
             className={classes.anchor}
-            href={`https://pancakeswap.finance/#/swap?outputCurrency=${process.env.REACT_APP_CONTRACT_ADDRESS}`}
+            target="_blank"
+            href={`https://exchange.pancakeswap.com/#/swap?outputCurrency=${process.env.REACT_APP_CONTRACT_ADDRESS}`}
           >
             Buy ADMONKEY
           </a>

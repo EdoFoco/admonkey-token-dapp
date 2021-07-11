@@ -1,17 +1,17 @@
-import React from 'react';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import AssignmentIcon from '@material-ui/icons/Assignment';
-import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
-import HistoryIcon from '@material-ui/icons/History';
-import EqualizerIcon from '@material-ui/icons/Equalizer';
-import InfoIcon from '@material-ui/icons/Info';
-import TelegramIcon from '@material-ui/icons/Telegram';
-import TwitterIcon from '@material-ui/icons/Twitter';
-import FacebookIcon from '@material-ui/icons/Facebook';
+import React from "react";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import AssignmentIcon from "@material-ui/icons/Assignment";
+import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart";
+import HistoryIcon from "@material-ui/icons/History";
+import EqualizerIcon from "@material-ui/icons/Equalizer";
+import InfoIcon from "@material-ui/icons/Info";
+import TelegramIcon from "@material-ui/icons/Telegram";
+import TwitterIcon from "@material-ui/icons/Twitter";
+import FacebookIcon from "@material-ui/icons/Facebook";
 
 function UnstyledAnchor({ children, url }) {
   return (
@@ -33,7 +33,9 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
     </ListItem>
-    <UnstyledAnchor url="https://pancakeswap.com/">
+    <UnstyledAnchor
+      url={`https://exchange.pancakeswap.com/#/swap?outputCurrency=${process.env.REACT_APP_CONTRACT_ADDRESS}`}
+    >
       <ListItem button>
         <ListItemIcon>
           <AddShoppingCartIcon />
@@ -41,7 +43,9 @@ export const mainListItems = (
         <ListItemText primary="Buy" />
       </ListItem>
     </UnstyledAnchor>
-    <UnstyledAnchor url="https://poocoin.com/">
+    <UnstyledAnchor
+      url={`https://poocoin.app/tokens/${process.env.REACT_APP_CONTRACT_ADDRESS}`}
+    >
       <ListItem button>
         <ListItemIcon>
           <EqualizerIcon />
@@ -49,7 +53,9 @@ export const mainListItems = (
         <ListItemText primary="Charts" />
       </ListItem>
     </UnstyledAnchor>
-    <UnstyledAnchor url="https://bscscan.com/token/0xC66e4F27D927B137D6245fc8647Eef887a127924/">
+    <UnstyledAnchor
+      url={`https://bscscan.com/token/${process.env.REACT_APP_CONTRACT_ADDRESS}`}
+    >
       <ListItem button>
         <ListItemIcon>
           <InfoIcon />

@@ -28,7 +28,7 @@ const useStyles = makeStyles({
     marginTop: "20px",
   },
   logo: {
-    width: "15%",
+    width: "20%",
   },
 });
 
