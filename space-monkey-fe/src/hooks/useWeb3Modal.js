@@ -9,7 +9,7 @@ function useWeb3Modal(config = {}) {
   const [signedInAddress, setSignedInAddress] = useState("");
 
   const { autoLoad = true } = config;
-  const { setInvalidChain, setInitialized, onLoad } = config;
+  const { setInvalidChain, setInitialized, onLoad, setChainId } = config;
 
   const rpcOptions = {};
   rpcOptions[process.env.REACT_APP_CHAIN_ID] =
@@ -22,6 +22,7 @@ function useWeb3Modal(config = {}) {
         package: WalletConnectProvider,
         options: {
           rpc: rpcOptions,
+          //network: "binance",
         },
         display: {
           name: "Mobile",
@@ -45,6 +46,7 @@ function useWeb3Modal(config = {}) {
     });
 
     newProvider.on("chainChanged", (chainId) => {
+      //(parseInt(chainId));
       if (parseInt(chainId) != process.env.REACT_APP_CHAIN_ID) {
         setInvalidChain(true);
       } else {
@@ -55,6 +57,8 @@ function useWeb3Modal(config = {}) {
 
   const loadWeb3Modal = useCallback(async () => {
     const newProvider = await web3Modal.connect();
+    console.log(newProvider);
+    //setChainId(parseInt(newProvider.chainId));
     if (parseInt(newProvider.chainId) != process.env.REACT_APP_CHAIN_ID) {
       setInvalidChain(true);
       return;
@@ -62,10 +66,22 @@ function useWeb3Modal(config = {}) {
 
     const web3Provider = new Web3Provider(newProvider);
 
+    //console.log(newProvider);
     let selectedAddress = newProvider.selectedAddress;
     if (!selectedAddress) {
-      selectedAddress = newProvider.accounts[0];
+      // handle wallet connect address
+      if (newProvider.accounts) {
+        selectedAddress = newProvider.accounts[0];
+      }
+
+      // handle trust wallet
+      if (newProvider.address) {
+        selectedAddress = newProvider.address;
+      }
     }
+
+    //console.log(selectedAddress);
+    setChainId(JSON.stringify(newProvider.address));
 
     setProvider(web3Provider);
     setSignedInAddress(selectedAddress);

@@ -14,8 +14,12 @@ export default function RewardsContainer() {
   const [invalidChain, setInvalidChain] = useState();
   const [adMonkey, setAdMonkey] = useState();
   const [loading, setLoading] = useState(true);
+  const [chainId, setChainId] = useState(null);
 
   const [_, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal({
+    setChainId: (chainId) => {
+      setChainId(chainId);
+    },
     setInvalidChain: (isInvalid) => {
       setInitialized(true);
       setInvalidChain(isInvalid);
@@ -36,6 +40,7 @@ export default function RewardsContainer() {
   };
 
   const loadAdMonkey = async (provider, account) => {
+    setChainId(JSON.stringify(account));
     if (provider) {
       const adMonkeyContract = new AdMonkey(provider.provider, account);
       await setAdMonkey(adMonkeyContract);
@@ -69,19 +74,24 @@ export default function RewardsContainer() {
   };
 
   return (
-    <Dashboard
-      initialized={initialized}
-      reward={reward}
-      onClaimReward={onClaimReward}
-      isClaimButtonDisabled={isClaimButtonDisabled()}
-      balance={balance}
-      nextAvailableClaimDate={nextAvailableClaimDate}
-      transactions={transactions}
-      invalidChain={invalidChain}
-      provider={provider}
-      loadWeb3Modal={loadWeb3Modal}
-      logoutOfWeb3Modal={logoutOfWeb3Modal}
-      loading={loading}
-    />
+    <div>
+      <Dashboard
+        initialized={initialized}
+        reward={reward}
+        onClaimReward={onClaimReward}
+        isClaimButtonDisabled={isClaimButtonDisabled()}
+        balance={balance}
+        nextAvailableClaimDate={nextAvailableClaimDate}
+        transactions={transactions}
+        invalidChain={invalidChain}
+        provider={provider}
+        loadWeb3Modal={loadWeb3Modal}
+        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        loading={loading}
+      />
+      {/* <div style={{ backgroundColor: "green", height: "40px" }}>
+        ChainId is: {chainId}
+      </div> */}
+    </div>
   );
 }
