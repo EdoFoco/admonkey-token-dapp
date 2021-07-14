@@ -727,7 +727,7 @@ library Utils {
         uint256 totalSupply
         //
     ) public view returns (uint256) {
-        uint256 bnbPool = currentBNBPool;
+        uint256 bnbPool = currentBNBPool.div(2);
 
         
         // calculate reward to send
@@ -936,6 +936,9 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     mapping(address => bool) private _isExcludedFromFee;
     mapping(address => bool) private _isExcluded;
     mapping(address => bool) private _isExcludedFromMaxTx;
+    mapping(address => bool) private _isWhitelistedLockdown;
+    
+    mapping(address => bool) public _isBlacklisted;
     
     mapping (address => uint256) private _canNextTransfer; // Next transfer mapping for 3 day block 
 
@@ -960,15 +963,23 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
 
     bool inSwapAndLiquify = false;
     bool public antiDump = true; // Enable the buyBan function 
-    bool public tradingIsEnabled = false; // Disable trading 
-    uint256 public buyBanTime = 259200; // Set buy back to 3 days
+    bool public tradingIsEnabled = false; // Disable trading - should be true to enable transfers
+    uint256 public buyBanTime = 259200; // Set buy back ban to 3 days
     
-    uint256 public rewardCycleBlock = 5 minutes;
-    uint256 public easyRewardCycleBlock = 1 minutes;
+    // Anti-bot and anti-whale mappings and variables for launch
+    mapping(address => uint256) private _holderLastTransferTimestamp; // to hold last Transfers temporarily during launch
+    bool public transferDelayEnabled = true;
+    
+    uint256 public rewardCycleBlock = 604800;
+    uint256 public easyRewardCycleBlock = 86400;
     uint256 public threshHoldTopUpRate = 2; // 2 percent
+    
     uint256 public disruptiveCoverageFee = 2 ether; // antiwhale
+    
     mapping(address => uint256) public nextAvailableClaimDate;
+    
     bool public swapAndLiquifyEnabled = false; // should be true
+    
     uint256 public disruptiveTransferEnabledFrom = 0;
     uint256 public disableEasyRewardFrom = 0;
     uint256 public winningDoubleRewardPercentage = 5;
@@ -984,12 +995,17 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     
     uint256 public bnbRewardFee = 3;
     uint256 public buybackFee = 3;
+    uint256 public combinedBnbFee = bnbRewardFee.add(buybackFee);
     uint256 public marketingFee = 2;
     uint256 public lpFee = 2;
     
-    uint256 public rewardThreshold = 1 ether;
+    uint256 public marketingDivisor = 4;
+    
+    uint256 public rewardThreshold = 1 ether; // Anything more than 1BNB of rewards, we will send 20% to the dead address!
 
-    uint256 minTokenNumberToSell = _tTotal.mul(1).div(10000).div(100); // 0.001% max tx amount will trigger swap and add liquidity
+    uint256 minTokenNumberToSell = 10 * 10**5 * 10**9; // 0.001% max tx amount will trigger swap and add liquidity
+    
+    bool public inLockdown = false; // Lockdown is here to prevent people adding LP, but allow the dev to carry out the airdrop!
     
     event SwapAndLiquifyEnabledUpdated(bool enabled);
     event SwapAndLiquify(
@@ -1024,7 +1040,7 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         
         _rOwned[_msgSender()] = _rTotal;
 
-        IPancakeRouter02 _pancakeRouter = IPancakeRouter02(0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3);
+        IPancakeRouter02 _pancakeRouter = IPancakeRouter02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
         
         // Testnet: 0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3
         
@@ -1047,9 +1063,21 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         _isExcludedFromMaxTx[address(this)] = true;
         _isExcludedFromMaxTx[address(0x000000000000000000000000000000000000dEaD)] = true;
         _isExcludedFromMaxTx[address(0)] = true;
+        
+        _isWhitelistedLockdown[owner()] = true; // Owner address - won't be able to airdrop otherwise!
+        _isWhitelistedLockdown[address(this)] = true; // Contract address 
+        _isWhitelistedLockdown[address(0x000000000000000000000000000000000000dEaD)] = true; // Burn address
+        _isWhitelistedLockdown[address(0)] = true;
+        _isWhitelistedLockdown[address(0x10ED43C718714eb63d5aA57B78B54704E256024E)] = true; // Pancakeswap Router
 
         emit Transfer(address(0), _msgSender(), _tTotal);
     }
+    
+    /**
+     * 
+     * @dev getters 
+     * 
+     */
 
     function name() public view returns (string memory) {
         return _name;
@@ -1070,6 +1098,10 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     function balanceOf(address account) public view override returns (uint256) {
         if (_isExcluded[account]) return _tOwned[account];
         return tokenFromReflection(_rOwned[account]);
+    }
+    
+    function canNextTransferCheck(address account) public view returns (uint256) {
+        return _canNextTransfer[account];
     }
 
     function transfer(address recipient, uint256 amount) public override returns (bool) {
@@ -1104,6 +1136,14 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
 
     function isExcludedFromReward(address account) public view returns (bool) {
         return _isExcluded[account];
+    }
+    
+    function isWhitelistedDuringLockdown(address account) public view returns (bool) {
+        return _isWhitelistedLockdown[account];
+    }
+    
+    function isInLockdown() public view returns (bool){
+        return inLockdown;
     }
 
     function totalFees() public view returns (uint256) {
@@ -1177,19 +1217,31 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     function includeInFee(address account) public onlyOwner {
         _isExcludedFromFee[account] = false;
     }
-
-    function setTaxFeePercent(uint256 taxFee) external onlyOwner() {
-        _taxFee = taxFee;
+    
+    function whitelistLockdown(address account) public onlyOwner {
+        _isWhitelistedLockdown[account] = true;
+    }
+    
+    function removeWhitelistLockdown(address account) public onlyOwner {
+        _isWhitelistedLockdown[account] = false;
     }
 
-    function setLiquidityFeePercent(uint256 setLiquidityFee) external onlyOwner() {
-        _liquidityFee = setLiquidityFee;
-    }
-
-    function setSwapAndLiquifyEnabled(bool _enabled) public onlyOwner {
-        swapAndLiquifyEnabled = _enabled;
-        emit SwapAndLiquifyEnabledUpdated(_enabled);
-    }
+    // remove transfer delay after launch
+  	function disableTransferDelay() external onlyOwner {
+  	    transferDelayEnabled = false;
+  	}
+  	
+  	// change the minimum amount of tokens to sell from fees
+    function updateMinTokenNumberToSell(uint256 newAmount) external onlyOwner returns (bool){
+  	    require(newAmount < totalSupply(), "Swap amount cannot be higher than total supply.");
+  	    minTokenNumberToSell = newAmount;
+  	    return true;
+  	}
+  	
+  	// enable/disable the antiDump function 
+  	function updateAntiDump(bool newAntiDump) external onlyOwner {
+  	    antiDump = newAntiDump;
+  	}
 
     //to receive BNB from pancakeRouter when swapping
     receive() external payable {}
@@ -1290,36 +1342,41 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         uint256 amount,
         uint256 value
     ) private {
+        if(inLockdown && !_isWhitelistedLockdown[from]){
+            bool canTransfer = false;
+            require(canTransfer, "Contract is in lockdown, can't complete the transfer");
+        }
         require(from != address(0), "BEP20: transfer from the zero address");
         require(to != address(0), "BEP20: transfer to the zero address");
         require(amount > 0, "Transfer amount must be greater than zero");
+        require(tradingIsEnabled, "Trading is currently disabled");
+        require(!checkIfDumped(to), "Anti-dump measure in place, transaction failed.");
+        require(!_isBlacklisted[from] && !_isBlacklisted[to], "To/from address is blacklisted!");
         
         
-        bool hasDumped = checkIfDumped(from);
-            
-        if(hasDumped && !_isExcludedFromFee[from]){
-            require(hasDumped == false, "Anti-dump measure in place, transaction failed.");
+        // Prevent buying more than 1 txn per block at launch. Bot killer. Will be removed shortly after launch.
+        
+        if (transferDelayEnabled){
+            if (to != owner() && to != address(pancakeRouter) && to != address(pancakePair) && !_isExcludedFromFee[to] && !_isExcludedFromFee[from]){
+                require(_holderLastTransferTimestamp[to] < block.timestamp, "_transfer:: Transfer Delay enabled.  Please try again later.");
+                _holderLastTransferTimestamp[to] = block.timestamp;
+            }
+        }
+        
+        if(antiDump){
+            if (to != owner() && from != address(pancakeRouter) && from != address(pancakePair) && !_isExcludedFromFee[from]){
+                uint256 soldPercent = amount.div(balanceOf(from)).mul(100);
+                
+                if(soldPercent >= 10 ){
+                   _canNextTransfer[from] = block.timestamp + buyBanTime;
+                }
+            }
         }
         
         ensureMaxTxAmount(from, to, amount, value);
         
-        uint256 contractTokenBalance = balanceOf(address(this));
-        
-        bool shouldSell = contractTokenBalance >= minTokenNumberToSell;
-        
-        if (
-            !inSwapAndLiquify &&
-        shouldSell &&
-        from != pancakePair &&
-        swapAndLiquifyEnabled &&
-        !(from == address(this) && to == address(pancakePair)) // swap 1 time
-        ) {
-        
-            uint256 swapTokens = contractTokenBalance.mul(_liquidityFee).div(totalFee);
-            
-            swapAndLiquify(from, to, swapTokens);
-            
-        }
+        // swap and liquify
+        swapAndLiquify(from, to);
 
         //indicates if fee should be deducted from transfer
         bool takeFee = true;
@@ -1327,14 +1384,6 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         //if any account belongs to _isExcludedFromFee account then remove the fee
         if (_isExcludedFromFee[from] || _isExcludedFromFee[to]) {
             takeFee = false;
-        }
-        
-        if(from != pancakePair){
-            uint256 soldPercent = amount.div(balanceOf(from)).mul(100);
-                
-            if(soldPercent >= 10 ){
-                _canNextTransfer[from] = block.timestamp + buyBanTime;
-            }
         }
         
         //transfer amount, it will take tax, burn, liquidity fee
@@ -1371,12 +1420,14 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
      * return bool
      * 
      */
-    function checkIfDumped(address walletHolder) view private returns(bool){
-        
-        if(_canNextTransfer[walletHolder] >= block.timestamp){
-            return true;
+    function checkIfDumped(address walletHolder) view public returns(bool){
+        if(!antiDump){
+            return false;
+        }else{
+            if(_canNextTransfer[walletHolder] >= block.timestamp){
+                return true;
+            }
         }
-        
         return false;
     }
     
@@ -1425,6 +1476,12 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     function callMoonShot(uint256 amount) external onlyOwner(){
         buyBackTokens(amount * 10**15); // i.e. "1" would equal 0.001 BNB
     }
+    
+    /**
+     * 
+     * @dev Setters 
+     * 
+     */
 
     function setMaxTxPercent(uint256 maxTxPercent) public onlyOwner() {
         _maxTxAmount = _tTotal.mul(maxTxPercent).div(10000);
@@ -1433,6 +1490,52 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     function setExcludeFromMaxTx(address _address, bool value) public onlyOwner {
         _isExcludedFromMaxTx[_address] = value;
     }
+    
+    function setTaxFeePercent(uint256 taxFee) external onlyOwner() {
+        _taxFee = taxFee;
+    }
+
+    function setLiquidityFeePercent(uint256 setLiquidityFee) external onlyOwner() {
+        _liquidityFee = setLiquidityFee;
+    }
+
+    function setSwapAndLiquifyEnabled(bool _enabled) public onlyOwner {
+        swapAndLiquifyEnabled = _enabled;
+        emit SwapAndLiquifyEnabledUpdated(_enabled);
+    }
+    
+    function setMarketingAddress(address payable newMarketingAddress) external onlyOwner {
+        marketingAddress = newMarketingAddress;
+    }
+    
+    function setMarketingDivisor(uint256 divisor) external onlyOwner {
+        marketingDivisor = divisor;
+    }
+    
+    function setCycleRewardBlockTime(uint256 cycleTime) external onlyOwner {
+        rewardCycleBlock = cycleTime;
+    }
+    
+    function setEasyCycleRewardBlockTime(uint256 easyCycleTime) external onlyOwner {
+        easyRewardCycleBlock = easyCycleTime;
+    }
+    
+    function blacklistAddress(address account, bool value) public onlyOwner {
+        _isBlacklisted[account] = value;
+    }
+    
+    /**
+     * 
+     * @dev - this function allows us to stop trading, so airdrop recipients can't add LP to the contract.
+     * 
+     */
+    function setLockdownStatus(bool status) external onlyOwner {
+        inLockdown = status;
+    }
+    
+    /**
+     *  BNB Reward Claim Handlers
+     */
 
     function calculateBNBReward(address ofAddress) public view returns (uint256) {
         uint256 rewardTotalSupply = uint256(_tTotal)
@@ -1456,7 +1559,7 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
 
     function claimBNBReward() isHuman nonReentrant public {
         require(nextAvailableClaimDate[msg.sender] <= block.timestamp, 'Error: next available not reached');
-        require(balanceOf(msg.sender) >= 0, 'Error: must own MRAT to claim reward');
+        require(balanceOf(msg.sender) >= 0, 'Error: must own ADMONKEY to claim reward');
 
         uint256 reward = calculateBNBReward(msg.sender);
 
@@ -1473,7 +1576,7 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         // update rewardCycleBlock
         nextAvailableClaimDate[msg.sender] = block.timestamp + getRewardCycleBlock();
         emit ClaimBNBSuccessfully(msg.sender, reward, nextAvailableClaimDate[msg.sender]);
-
+        
         (bool sent,) = address(msg.sender).call{value : reward}("");
         require(sent, 'Error: Cannot withdraw reward');
     }
@@ -1489,6 +1592,10 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
             amount
         );
     }
+    
+    /**
+     * Transaction logic 
+     */
 
     function ensureMaxTxAmount(
         address from,
@@ -1510,13 +1617,19 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         _transfer(_msgSender(), recipient, amount, msg.value);
         return true;
     }
-
-    function swapAndLiquify(address from, address to, uint256 amount) private {
+    
+    /**
+     * 
+     * @dev handle the swap and liquify process - manage fees etc.
+     * 
+     */
+    function swapAndLiquify(address from, address to) private {
+        
         // is the token balance of this contract address over the min number of
         // tokens that we need to initiate a swap + liquidity lock?
         // also, don't get caught in a circular liquidity event.
         // also, don't swap & liquify if sender is pancake pair.
-        uint256 contractTokenBalance = amount;
+        uint256 contractTokenBalance = balanceOf(address(this));
 
         if (contractTokenBalance >= _maxTxAmount) {
             contractTokenBalance = _maxTxAmount;
@@ -1531,16 +1644,83 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         swapAndLiquifyEnabled &&
         !(from == address(this) && to == address(pancakePair)) // swap 1 time
         ) {
+            
+            // add liquidity
+            // split the contract balance into 5 pieces - 2% for LP, 2% for Marketing, 6% for reward pool/buyback 
+            uint256 pooledBNB = contractTokenBalance.div(5); // 2%
+            
+            uint256 lpBnb = pooledBNB;
+            
+            uint256 lpTokens = pooledBNB.div(2); // 1% - half for token LP, half for BNB LP 
 
-            // add liquidity,, take BNB Reward pool tax and marketing tax 
-            // split the contract balance into 4 pieces
-            uint256 marketingBNB = contractTokenBalance.div(4); // One quarter
-            uint256 pooledBNB = contractTokenBalance.sub(marketingBNB);
+            uint256 tokenAmountToBeSwapped = contractTokenBalance.sub(pooledBNB); // 8% for BNB pool 
+
+            uint256 initialBalance = address(this).balance;
 
             // now is to lock into staking pool
-            Utils.swapTokensForEth(address(pancakeRouter), pooledBNB);
-            Utils.swapTokensForEthMarketing(address(pancakeRouter), marketingAddress, marketingBNB);
+            swapTokensForEth(tokenAmountToBeSwapped);
+            
+            // how much BNB did we just swap into?
+
+            // capture the contract's current BNB balance.
+            // this is so that we can capture exactly the amount of BNB that the
+            // swap creates, and not make the liquidity event include any BNB that
+            // has been manually sent to the contract
+            uint256 deltaBalance = address(this).balance.sub(initialBalance);
+            
+            (bool sent,) = address(marketingAddress).call{value : deltaBalance.div(marketingDivisor)}("");
+            require(sent, "Can not send to marketing Address");
+            
+            
+            uint256 bnbToBeAddedToLiquidity = deltaBalance.div(4);
+
+            // add liquidity to pancake
+            addLiquidity(pooledBNB, bnbToBeAddedToLiquidity);
+
+            emit SwapAndLiquify(lpTokens, deltaBalance, lpBnb);
         }
+    }
+    
+    function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
+        
+        // approve token transfer to cover all possible scenarios
+        _approve(address(this), address(pancakeRouter), tokenAmount);
+
+        // add the liquidity
+        pancakeRouter.addLiquidityETH{value: ethAmount}(
+            address(this),
+            tokenAmount,
+            0, // slippage is unavoidable
+            0, // slippage is unavoidable
+            pancakePair,
+            block.timestamp
+        );
+        
+    }
+    
+    /**
+     * 
+     * @dev Convert relevant tokens for BNB using the PancakeRouter 
+     * 
+     */
+    function swapTokensForEth(uint256 tokenAmount) private {
+
+        // generate the uniswap pair path of token -> weth
+        address[] memory path = new address[](2);
+        path[0] = address(this);
+        path[1] = pancakeRouter.WETH();
+
+        _approve(address(this), address(pancakeRouter), tokenAmount);
+
+        // make the swap
+        pancakeRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(
+            tokenAmount,
+            0, // accept any amount of ETH
+            path,
+            address(this),
+            block.timestamp
+        );
+        
     }
     
     function swapETHForTokensMoonshot(uint256 amount) private {
@@ -1559,9 +1739,16 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         
         emit SwapETHForTokensMoonshot(amount, path);
     }
-    
+
+    /**
+     * 
+     * @dev Presale logic 
+     * 
+     */
     function prepareForPreSale() external onlyOwner {
         setSwapAndLiquifyEnabled(false);
+        tradingIsEnabled = true;
+        inLockdown = true;
         _taxFee = 0;
         _liquidityFee = 0;
         bnbRewardFees = 0;
@@ -1571,19 +1758,27 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
     
     function afterPreSale() external onlyOwner {
         setSwapAndLiquifyEnabled(true);
+        inLockdown = true;
         _taxFee = 2;
         _liquidityFee = 2;
         bnbRewardFees = 10;
         totalFee = bnbRewardFees.add(_liquidityFee);
         _maxTxAmount = 100 * 10**6 * 10**9;
+        tradingIsEnabled = false;
     }
 
-
+    /**
+     * 
+     * @dev activate the contract - without this no reward systems or transactions will be allowed
+     * 
+     */
     function activateContract() public onlyOwner {
         // reward claim
-        disableEasyRewardFrom = block.timestamp + 1 weeks;
-        rewardCycleBlock = 5 minutes;
-        easyRewardCycleBlock = 1 minutes;
+        disableEasyRewardFrom = block.timestamp + 604800;
+        rewardCycleBlock = 604800;
+        easyRewardCycleBlock = 86400;
+        
+        inLockdown = false;
 
         winningDoubleRewardPercentage = 5;
 
@@ -1592,7 +1787,10 @@ contract AdMonkey is Context, IBEP20, Ownable, ReentrancyGuard {
         disruptiveTransferEnabledFrom = block.timestamp;
         setMaxTxPercent(1);
         setSwapAndLiquifyEnabled(true);
-
+        tradingIsEnabled = true;
+        _maxTxAmount = 1000 * 10**6 * 10**9;
+        minTokenNumberToSell = 10 * 10**4 * 10**9;
+        
         // approve contract
         _approve(address(this), address(pancakeRouter), 2 ** 256 - 1);
     }
