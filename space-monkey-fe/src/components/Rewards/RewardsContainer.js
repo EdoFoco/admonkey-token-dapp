@@ -15,6 +15,8 @@ export default function RewardsContainer() {
   const [adMonkey, setAdMonkey] = useState();
   const [loading, setLoading] = useState(true);
   const [chainId, setChainId] = useState(null);
+  const [claimedRewardTransaction, setClaimedRewardTransaction] =
+    useState(null);
 
   const [_, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal({
     setChainId: (chainId) => {
@@ -67,9 +69,10 @@ export default function RewardsContainer() {
 
   const onClaimReward = async () => {
     if (adMonkey) {
-      await adMonkey.claimBnbReward();
+      const tx = await adMonkey.claimBnbReward();
       const nextClaimDate = await adMonkey.nextAvailableClaimDate();
       setNextAvailableClaimDate(null);
+      setClaimedRewardTransaction(tx.transactionHash);
     }
   };
 
@@ -88,10 +91,8 @@ export default function RewardsContainer() {
         loadWeb3Modal={loadWeb3Modal}
         logoutOfWeb3Modal={logoutOfWeb3Modal}
         loading={loading}
+        claimedRewardTransaction={claimedRewardTransaction}
       />
-      {/* <div style={{ backgroundColor: "green", height: "40px" }}>
-        ChainId is: {chainId}
-      </div> */}
     </div>
   );
 }

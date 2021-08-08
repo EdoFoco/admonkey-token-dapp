@@ -55,7 +55,7 @@ export default function Rewards(props) {
           onClaimReward();
         }}
       >
-        {`${reward ? reward.toFixed(18) : ""} BNB`}
+        {`${reward ? reward.toFixed(9) : ""} BNB`}
       </Button>
 
       <Typography color="textSecondary" className={classes.depositContext}>

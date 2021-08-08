@@ -22,7 +22,8 @@ function useWeb3Modal(config = {}) {
         package: WalletConnectProvider,
         options: {
           rpc: rpcOptions,
-          //network: "binance",
+          network: process.env.REACT_APP_WEB3MODAL_NETWORK,
+          bridge: "https://b.bridge.walletconnect.org",
         },
         display: {
           name: "Mobile",
@@ -57,8 +58,6 @@ function useWeb3Modal(config = {}) {
 
   const loadWeb3Modal = useCallback(async () => {
     const newProvider = await web3Modal.connect();
-    console.log(newProvider);
-    //setChainId(parseInt(newProvider.chainId));
     if (parseInt(newProvider.chainId) != process.env.REACT_APP_CHAIN_ID) {
       setInvalidChain(true);
       return;
@@ -66,7 +65,6 @@ function useWeb3Modal(config = {}) {
 
     const web3Provider = new Web3Provider(newProvider);
 
-    //console.log(newProvider);
     let selectedAddress = newProvider.selectedAddress;
     if (!selectedAddress) {
       // handle wallet connect address
@@ -80,7 +78,6 @@ function useWeb3Modal(config = {}) {
       }
     }
 
-    //console.log(selectedAddress);
     setChainId(JSON.stringify(newProvider.address));
 
     setProvider(web3Provider);

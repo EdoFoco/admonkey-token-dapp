@@ -163,6 +163,7 @@ export default function Dashboard(props) {
     loadWeb3Modal,
     logoutOfWeb3Modal,
     loading,
+    claimedRewardTransaction,
   } = props;
 
   const [open, setOpen] = useState(false);
@@ -301,7 +302,27 @@ export default function Dashboard(props) {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        {/* <RenderTopSection balance={balance} reward={reward} /> */}
+        {!claimedRewardTransaction ? null : (
+          <div
+            style={{
+              backgroundColor: "#e67e22",
+              color: "white",
+              height: "80px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ fontSize: "1.5rem" }}>
+              Congratulations! Your reward is on its way. Track it on{" "}
+              <a
+                href={`${process.env.REACT_APP_BSCSCAN_BASE_URL}/tx/${claimedRewardTransaction}`}
+              >
+                BSSCAN.
+              </a>
+            </div>
+          </div>
+        )}
         <Banner balance={balance} reward={reward} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
