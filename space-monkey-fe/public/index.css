@@ -1,14 +1,23 @@
-html, body {
+html,
+body {
   height: 100%;
 }
 
 body {
   color: #333;
-  font-family: 'Montserrat', 'sans-serif';
+  font-family: "Montserrat", "sans-serif";
   font-weight: 300;
-  background-image: url('./images/SpaceMonkey_Background-scaled.jpeg');
+  background-color: rgba(248, 249, 250, 1);
   margin: 20px;
   background-size: cover;
+}
+
+.MuiTypography-colorPrimary {
+  color: #e67e22 !important;
+}
+
+.MuiButton-containedPrimary {
+  background-color: #e67e22 !important;
 }
 
 #root {
@@ -31,7 +40,7 @@ body {
 }
 
 .sidebar-logo {
-  background-image: url('./images/SpaceLogo_Transparent.png');
+  background-image: url("./images/SpaceLogo_Transparent.png");
   background-size: cover;
   width: 150px;
   height: 150px;
@@ -66,7 +75,7 @@ body {
 
 .main-content {
   border-radius: 10px;
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(0, 0, 0, 0.6);
   color: white;
   padding: 20px;
   margin: 20px;
@@ -97,3 +106,13 @@ body {
 .reward-date {
   padding: 20px;
 }
+
+/* Material-UI */
+.MuiTypography-colorPrimary{
+  color:rgb(230, 126, 34) !important;
+}
+
+.MuiButton-containedPrimary	{
+  background-color:rgb(230, 126, 34) !important;
+}
+/* End Material-UI */

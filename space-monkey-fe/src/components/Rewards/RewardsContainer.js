@@ -1,126 +1,115 @@
-// external libraries
-import React from 'react'
-import _ from 'lodash';
+import React, { useState } from "react";
+import useWeb3Modal from "../../hooks/useWeb3Modal";
+import Dashboard from "./rewardsDashboard/Dashboard";
+import AdMonkey from "../../contracts/AdMonkey";
+import AdMonkeyV2 from "../../contracts/AdMonkeyV2";
+import { getTokenTransactionsForWallet } from "../../services/bsscan";
 
-// own services
-import { withAppContextConsumer } from '../../services/app-context';
-import { withDrizzleContextConsumer } from '../../services/drizzle';
+export default function RewardsContainer() {
+  const [initialized, setInitialized] = useState();
+  const [provider, setProvider] = useState();
+  const [reward, setBnbReward] = useState();
+  const [balance, setBalance] = useState();
+  const [nextAvailableClaimDate, setNextAvailableClaimDate] = useState();
+  const [transactions, setTransactions] = useState([]);
+  const [invalidChain, setInvalidChain] = useState();
+  const [adMonkey, setAdMonkey] = useState();
+  const [adMonkeyV2, setAdMonkeyV2] = useState();
+  const [v2Balance, setV2Balance] = useState();
+  const [loading, setLoading] = useState(true);
+  const [chainId, setChainId] = useState(null);
+  const [claimedRewardTransaction, setClaimedRewardTransaction] =
+    useState(null);
 
-// smart contracts
-import SpaceMonkeyContract from '../../contracts/SpaceMonkey';
-import Dashboard from './rewardsDashboard/Dashboard';
+  const [_, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal({
+    setChainId: (chainId) => {
+      setChainId(chainId);
+    },
+    setInvalidChain: (isInvalid) => {
+      setInitialized(true);
+      setInvalidChain(isInvalid);
+    },
+    onLoad: (provider, selectedAccount) => {
+      setInitialized(true);
+      setInvalidChain(false);
+      setProvider(provider);
+      loadAdMonkey(provider, selectedAccount);
+      loadAdMonkeyV2(provider, selectedAccount);
+      setLoading(false);
+    },
+  });
 
-import { getTokenTransactionsForWallet } from '../../services/bsscan';
-
-class RewardsContainer extends React.Component {
-
-    isClaimButtonDisabled() {
-        if (
-            null != this.state.reward
-          && parseFloat(this.state.reward, 10) === 0
-          && true===true) {
-            return false;
-          }
-        return true;
-      }
-
-    onClaimReward() {
-        SpaceMonkeyContract.claimReward()
-        .then(reward => {
-            console.log('here is your reward: ', reward);
-        })
+  const isClaimButtonDisabled = () => {
+    if (null != reward && parseFloat(reward, 10) !== 0) {
+      return false;
     }
+    return true;
+  };
 
-    constructor(props) {
-        super(props);
+  const loadAdMonkey = async (provider, account) => {
+    setChainId(JSON.stringify(account));
+    if (provider) {
+      const adMonkeyContract = new AdMonkey(provider.provider, account);
+      await setAdMonkey(adMonkeyContract);
 
-        const { drizzle, drizzleState, initialized } = props.drizzleContext;
-        this.web3 = drizzle.web3;
-        this.contracts = drizzle.contracts;
-        this.drizzleState = drizzleState;
+      const balance = await adMonkeyContract.getBalance();
+      const bnbReward = await adMonkeyContract.calculateBNBReward();
+      let nextAvailableClaimDate =
+        await adMonkeyContract.nextAvailableClaimDate();
 
-        this.state = {
-            initialized: false,
-            reward: null,
-            balance: null,
-            nextAvailableClaimDate: null,
-            transactions: []
-        };
+      nextAvailableClaimDate =
+        nextAvailableClaimDate && nextAvailableClaimDate > 0
+          ? new Date(nextAvailableClaimDate * 1000)
+          : null;
+
+      const transactions = await getTokenTransactionsForWallet(account);
+
+      setBnbReward(bnbReward / 10 ** 18);
+      setBalance(Math.round((balance / 10 ** 9) * 1000, 6) / 1000);
+      setNextAvailableClaimDate(nextAvailableClaimDate);
+      setTransactions(transactions);
     }
+  };
 
-    componentDidMount() {
-        const { drizzle } = this.props.drizzleContext;
+  const loadAdMonkeyV2 = async (provider, account) => {
+    setChainId(JSON.stringify(account));
+    if (provider) {
+      const adMonkeyContract = new AdMonkeyV2(provider.provider, account);
+      await setAdMonkeyV2(adMonkeyContract);
 
-        this.unsubscribe = drizzle.store.subscribe(() => {
-            const drizzleState = drizzle.store.getState();
+      const balance = await adMonkeyContract.getBalance();
 
-            if (drizzleState.drizzleStatus.initialized && !this.state.initialized) {
-                this.setState({ initialized: true });
-
-                SpaceMonkeyContract.drizzle = drizzle;
-                SpaceMonkeyContract.calculateBNBReward()
-                    .then(reward => {
-                        // Todo: Handle BigInts
-                        this.setState({ "reward": Math.round(reward / (10 ** 18) * 100000, 6) / 100000});
-                    });
-
-                SpaceMonkeyContract.getBalance()
-                    .then(balance => {
-                        // Todo: Handle BigInts
-                        this.setState({ "balance": (balance).toString()});
-                    });
-
-                SpaceMonkeyContract.nextAvailableClaimDate()
-                    .then(date => {
-                        this.setState({ "nextAvailableClaimDate": new Date(date * 1000) });
-                    });
-
-                getTokenTransactionsForWallet(drizzleState.accounts[0])
-                    .then(txns => {
-                        this.setState({"transactions": txns});
-                    });
-
-            }
-        });
+      setV2Balance(Math.round((balance / 10 ** 9) * 1000, 6) / 1000);
+      console.log(`V2 balance is: ${balance}`);
     }
+  };
 
-    componentWillUnmount() {
-        this.unsubscribe();
+  const onClaimReward = async () => {
+    if (adMonkey) {
+      const tx = await adMonkey.claimBnbReward();
+      const nextClaimDate = await adMonkey.nextAvailableClaimDate();
+      setNextAvailableClaimDate(null);
+      setClaimedRewardTransaction(tx.transactionHash);
     }
+  };
 
-    clickMe() {
-        alert("You clicked me!");
-    }
-
-    render() {
-        if(this.drizzleState.accounts.length === 0){
-            return(<div>We couldn't find a valid Wallet. Please create a wallet and come back.</div>)
-        }
-
-        return (
-        <Dashboard
-            reward={this.state.reward}
-            onClaimReward={this.onClaimReward}
-            isClaimButtonDisabled={this.isClaimButtonDisabled()}
-            balance={this.state.balance}
-            nextAvailableClaimDate={this.state.nextAvailableClaimDate}
-            transactions={this.state.transactions} />);
-        // // <div className="reward-container">
-        // //     <div className="reward-box">
-        // //         <div className="reward-title">Your Reward</div>
-        // //         <div className="reward-value">{Math.round((this.state.reward / (10 ** 18) * 100000), 6) / 100000} BNB</div>
-        // //         <div className="reward-date">You can withdraw your reward on the {this.state.nextAvailableClaimDate}</div>
-        // //         <button className="buy-button" onClick={this.clickMe}>Claim Reward</button>
-        // //     </div>
-        // //     {/* Your balance is: {this.state.balance / (10 ** 9)} SPC */}
-
-        // </div>);
-    }
+  return (
+    <div>
+      <Dashboard
+        initialized={initialized}
+        reward={reward}
+        onClaimReward={onClaimReward}
+        isClaimButtonDisabled={isClaimButtonDisabled()}
+        balance={balance}
+        nextAvailableClaimDate={nextAvailableClaimDate}
+        transactions={transactions}
+        invalidChain={invalidChain}
+        provider={provider}
+        loadWeb3Modal={loadWeb3Modal}
+        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        loading={loading}
+        claimedRewardTransaction={claimedRewardTransaction}
+      />
+    </div>
+  );
 }
-
-const enhance = _.flowRight([
-    withDrizzleContextConsumer,
-    withAppContextConsumer,
-]);
-
-export default enhance(RewardsContainer);
